@@ -1,0 +1,598 @@
+---
+title: "Expression of CXCL9/10/11, CXCL13 and XCL1 orchestrates cytotoxic T cell infiltration and suppression in renal cell carcinoma"
+subtitle: "Supplementary Material"
+author: "Uro study team"
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
+
+output: 
+  bookdown::word_document2:   
+    reference_docx: ms_template.docx
+    
+bibliography: cxcl_biblio.bib
+csl: frontiers-in-immunology.csl
+header-includes:
+  \usepackage{longtable}
+  \usepackage{tabu}
+  \usepackage{caption}
+  \usepackage{makecell}
+  \usepackage{pdflscape}
+  \usepackage{array}
+  \usepackage{booktabs}
+  \usepackage{threeparttable}
+  \usepackage{threeparttablex}
+  \usepackage{wrapfig}
+  \usepackage{multirow}
+  \usepackage[normalem]{ulem}
+  \usepackage{colortbl}
+  \usepackage{xcolor}
+  \usepackage{float} \floatplacement{figure}{H} \floatplacement{table}{H}
+  \newcommand{\beginsupplement}{\setcounter{table}{0}  \renewcommand{\thetable}{S\arabic{table}}       \setcounter{figure}{0} \renewcommand{\thefigure}{S\arabic{figure}}}
+---
+
+```{r, setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, 
+                      dev = "png", dpi = 600, 
+                      tab.cap.pre = 'Supplementary Table ', tab.cap.sep = " ", 
+                      tab.cap.style = 'Table Heading')
+
+set_flextable_defaults(font.family = 'Cambria', 
+                       font.size = 10)
+
+
+```
+
+\newpage
+
+# Supplementary Methods
+
+## Data import and transformation
+
+Clinical information and normalized RNA-seq expression estimates for the Kidney Clear Cell Carcinoma (KIRC) TCGA project [@Creighton2013] were downloaded from the GDC Data Portal with the help of the TCGA-Assembler script (https://github.com/compgenome365/TCGA-Assembler-2/blob/master/TCGA-Assembler/). 
+Clinical and normalized RNAseq expression data for the RECA-EU cohort were fetched from https://dcc.icgc.org/projects/RECA-EU. 
+Clinical information and normalized RNA-seq expression data for the CheckMate 010 (CM 010) and CheckMate 025 (CM 025) cohorts were extracted from the report of Braun et al. [@Braun2020] (Tables S1 and S4 accompanying the paper). 
+To get more insight at possible effects of therapy with immune checkpoint inhibitors, the CheckMate 025 everolimus (CM 025 EVER) and nivolumab (CM 025 NIVO) treatment arms were analyzed separately in the current report.
+Clinical information and normalized RNA-seq data for the RECA-EU study were extracted from the ICGC Data Portal [@RECA]. 
+Normalized microarray expression data and clinical information for the GSE73731 [@Wei2017] and GSE167093 [@Laskar2021] cohorts (platforms: Affymetrix Human Genome U133 Plus 2.0 and Illumina HumanHT-12 V4.0 expression beadchip, respectively) were extracted from the GEO API with the _GEOquery_ package [@Sean2007].
+Normalized microarray expression data (Agilent Human Gene Expression 4x44K v2 Microarray) and clinical information for the E-MTAB 1980 [@Sato2013] cohort were downloaded from the ArrayExpress portal.
+For the microarray expression studies, integration of multiple probes targeting the same gene was accomplished by geometric mean. The clinical characteristic of the analyzed studies is provided in __Table 1__.
+
+Expression values were treated with the $log_2(transcript count + 1)$ (RNA sequencing) of log~2~ transformation (microarray) to improve normality. 
+The chemokine genes of interest (_CXCL9/10/11_, _CXCL13_ and _XCR1_) were identified to be preferentially expressed in the RCC tissue as compared with the normal kidney and correlate with predicted tumor-infiltrating CD8^+^ T cell levels as described in more details below. 
+
+Estimates of non-malignant and immune infiltration in RCC were calculated using the QuanTIseq [@Finotello2019] and xCell [@Aran2017] algorithms implemented in R by the _immunedeconv_ package [@Sturm2020]. 
+Gene signatures corresponding to Reactome pathways were extracted from a local copy of the MSig database (version 7.5.1, http://www.gsea-msigdb.org/gsea/index.jsp) and the signatures' single sample gene set enrichment analysis scores (ssGSEA) were calculated with the _GSVA_ [@Hanzelmann2013] and the development _gseaTools_ package (https://github.com/PiotrTymoszuk/gseaTools).
+
+Genes associated with T cell exhaustion were retrieved from four recent papers [@Cai2020; @Woroniecka2018; @Kocher2022; @Zhang2022]. 
+Genes associated with interferon alpha/beta signaling and interferon gamma signaling were obtained from the Reactome database (pathways: R-HSA-909733 and R-HSA-877300). 
+
+## Software
+
+The statistical and bioinformatic analysis was done with R 4.2.0. 
+Tabular data were handled with the _tidyverse_ package bundle [@Wickham2019] and the development package _trafo_ (https://github.com/PiotrTymoszuk/trafo). 
+Text data were transformed with the _stringi_ package [@Gagolewski2021]. 
+Prediction of non-malignant cell content was done with the _immunedeconv_ package [@Sturm2020]. 
+Gene signatures were retrieved, stored and their scores calculated with the _gseaTools_ development package (https://github.com/PiotrTymoszuk/gseaTools). 
+Parallelization was accomplished with _furrr_ [@Vaughan2022].
+
+UMAP (Uniform Manifold Approximation and Projection) clustering [@McInnes2018; @Konopka2022] and semi-supervised clustering was done with the development package _clustTools_ (https://github.com/PiotrTymoszuk/clustTools) providing a common interface to multiple dimensionality reduction and clustering algorithms and employing among others algorithms from the packages _cluster_ [@Schubert2019], _philentropy_ [@Drost2018], _factoextra_ [@Kassambara2020], _dbscan_ [@Hahsler2019] and _umap_ [@Konopka2022]. 
+Exploratory analysis and statistical hypothesis testing (comparison and correlation) was done with the _rstatix_ [@Kassambara2021] package and the development package _ExDA_. 
+For survival analysis, the packages _survival_ [@Therneau2000], _survminer_ [@Kassambara2016], _glmnet_ [@Friedman2010] and the development package _coxExtensions_ (https://github.com/PiotrTymoszuk/coxExtensions) were employed. 
+Differential gene expression analysis and comparison of Reactome ssGSEA score between the clusters was done with the development package _microViz_ (https://github.com/PiotrTymoszuk/microViz). 
+Modulation of signaling pathways was investigated with the _SPIA_ algorithm [@Tarca2009]. 
+Analysis of differences in metabolic reaction activity was done with the _Biggr_ [@Gavai2015] package and the development package _biggrExtra_ (https://github.com/PiotrTymoszuk/biggrExtra).
+
+Visualization of the analysis results was accomplished with _ggplot2_ [@Wickham2016], _cowplot_ [@Wilke2019], _ExDA_ (violin, box and stack plots), _microViz_ (Forest plots, bar plots of regulation estimates and p values, volcano plots). 
+Kaplan-Meier plots were generated with _survminer_ [@Kassambara2016]. 
+
+Parts of the manuscript and supplementary material were written in the _rmarkdown_ environment [@Allaire2022] and rendered as Word and pdf files with _bookdown_ [@Xie2016] and _knitr_ [@Xie2022]. 
+Tables were generated with the _flextable_ package [@Gohel2022]. 
+Management of figures and tables in the Rmarkdown documents (insertion, referencing) was done with the development package _figur_ (https://github.com/PiotrTymoszuk/figur).
+
+## Characteristic of the study cohorts
+
+Numeric variables are presented as medians with interquartile ranges. 
+Categorical variables are shown as percentages and counts within the complete observation set. 
+Descriptive statistic for demographic and clinical features of the investigated cohorts was done with _ExDA_ (function `explore()`). 
+
+## Genes of interest
+
+The chemokine genes of interest were identified within the set of `r length(screen$variables)` chemokine genes available for all investigated datasets (_`r paste(screen$variables, collapse = ', ')`_). 
+The chemokine genes were screened in the TCGA KIRC cohort for differences in expression levels between the RCC and normal kidney tissue (paired normal/tumor samples, two-tailed paired T test, function `test_two_groups()`, _microViz_ package), and for correlation with CD8^+^ T cell content in RCC predicted with the QuanTIseq algorithm [@Finotello2019] (Spearman's correlation, `correlate_variables()`, package _ExDA_). 
+In these analyses expression of 
+_CXCL9_ (Entrez ID: `r translate_gene('CXCL9')`), 
+_CXCL10_ (`r translate_gene('CXCL10')`), 
+_CXCL11_ (`r translate_gene('CXCL11')`), 
+_CXCL13_ (`r translate_gene('CXCL13')`) and 
+_XCL1_ (`r translate_gene('XCL1')`) was found to be highly enriched in the malignant tissue and strongly significantly associated with the predicted CD8^+^ T cell levels (__Supplementary Figure S\@ref(fig:fig-chemo-screen)__). 
+These chemokine genes along with their cognate receptors 
+_CXCR3_ (Entrez ID: `r translate_gene('CXCR3')`, receptor for CXCL9/10/11), 
+_CXCR5_ (`r translate_gene('CXCR5')`, receptor for CXCL13) and 
+_XCR1_ (`r translate_gene('XCR1')`, receptor for XCL1) were investigated further in the current report.
+
+## Comparison of gene expression between the normal and tumor samples
+
+log~2~-transformed expression levels of the genes of interest (_`r paste(globals$cxcl_genes, collapse = ', ')`_)
+were compared between the donor-matched normal kidney and cancer samples in the TCGA and GSE167093 cohorts with two-tailed paired T test corrected for multiple testing with false discovery rate (FDR) method [@Benjamini1995] and Cohen's d effect size statistic (function `compare_variables()`, package _ExDA_, employing tools from _rstatix_) [@Kassambara2021]. 
+
+## Expression of the genes of interest and non-malignant cell infiltration
+
+Association of the log~2~-transformed expression levels of the genes of interest with the QuanTIseq and xCell estimated content of non-tumor cells in the cancer sample [@Finotello2019; @Sturm2020; @Aran2017] was investigated with Spearman's correlation (function `correlate_variables()`, package _ExDA_) with FDR adjustment for multiple testing [@Benjamini1995]. 
+In addition, median-centered normalized datasets of xCell infiltration estimates were subjected to two-dimensional UMAP (with cosine distance between the observations, function `reduce_data(red_fun = 'umap', kdim = 2)`, package _clustTools_ employing tools provided by _umap_) [@McInnes2018; @Konopka2022]. 
+Normalized expression levels of the genes of interest and normalized levels of specific immune cell types were drawn in UMAP layout plots (method `plot()`, package _clustTools_) to visualize clusters of cancer samples characterized by high chemokine expression and extensive infiltration by T cells, myeloid dendritic cells (mDC) and tumor-associated macrophages (TAM).
+
+## Survival modeling
+
+Correlation of log~2~-transformed cancer expression levels of the genes of interest with overall (TCGA KIRC, E-MTAB 1980, RECA-EU and CheckMate cohorts) and relapse-free survival (TCGA KIRC, CheckMate) was investigated by uni-variable Cox proportional hazard modeling (function `coxph()`, package _survival_) [@Therneau2000]. 
+Linear and spline term (`pspline`, package _survival_, with 4 degrees of freedom [df]) for the gene expression variable were included in the Cox models. 
+Hazard ratio (HR) estimates for the linear terms (Z test) and significance for the spline terms ($\chi^2$ test) were calculated with the `summary(type = 'inference')` method (package _coxExtensions_). 
+No significant associations of the gene expression splines with overall or relapse-free survival could be observed (not shown). 
+Proportional hazard assumptions of the models [@Grambsch1994] and fit statistics (R^2, concordance index [C]) were calculated with the `summary(type = 'assumptions')` and `summary(type = 'fit')` methods (package _coxExtensions_). 
+
+Multi-parameter modeling of overall survival was done in the TCGA KIRC, E-MTAB 1980 and RECA-EU collectives with Ridge regularized Cox regression (package _glmnet_) [@Friedman2010]. 
+The explanatory factors included age, squared age, sex, tumor grade (G3/G4 versus G1/G2), tumor stage (T3/T4 versus T1/T2), metastasis stage (M1 versus M0) variables and log~2~-transformed expression values of the genes of interest. 
+Two models were trained in the TCGA KIRC cohort: a model with demographic/grade/stage variables only and a model with the complete set of explanatory factors. 
+The values of $\lambda$ shrinkage metric were found by 200-repeated 10-fold cross validation and corresponded to the optimally regularized models with the lowest deviance (`lambda.1se` parameter, $\lambda$ tuning done with `cv.glmnet`, package _glmnet_) [@Friedman2010]. 
+_glmnet_ Ridge Cox models were constructed for the optimal $\lambda$ values. 
+Subsequently, linear predictor scores for the _glmnet_ models were calculated (method `predict()`, package _glmnet_) for the training TCGA KIRC cohort, and the E-MTAB 1980 and RECA-EU test collectives. 
+Association of the linear predictor scores with overall survival was assessed as described above. 
+To assess the add-on effect of expression of the genes of interest on the survival prediction accuracy as compared with the demographic/grade/stage information, concordance indexes of the full models and the demographic/grade/stage-only models were compared.
+
+## Semi-supervised clustering
+
+Two clusters of cancer samples, chemokine low and high, were defined in respect to normalized log~2~-transformed expression of the genes of interest in the TCGA KIRC training cohort with PAM (partition around medoids, cosine distance, function `kcluster(clust_fun = 'pam')`, package _clustTools_ employing tools from _philentropy_ and _cluster_) [@Schubert2019; @Drost2018]. 
+The clustering algorithm was chosen based on its superior accuracy in 10-fold cross-validation [@Lange2004] and high fraction of explained clustering variance (ratio of between-cluster sum of squares to total sum of squares) as compared with several other clustering procedures and distance statistics (methods `cv()` and `var()`, package _clustTools_, __Supplementary Figure S\@ref(fig:fig-clust-training)A__). 
+Choice of the cluster number (k = 2) was motivated by the bend of the within-cluster sum of squares curve and the peak mean silhouette statistic (method `plot(type = 'diagnostic')`, package _clustTools_, __Supplementary Figure S\@ref(fig:fig-clust-training)B__). 
+Finally, separation between the clusters was corroborated by a visual analysis of the distance heat map (`plot(type ='heat_map')`, __Supplementary Figure S\@ref(fig:fig-clust-training)C__). 
+
+Prediction of the cluster assignment in the test collectives was done with a 15-nearest neighbor (15-NN) classifier with inverse distance weighting (method `predict(type = 'propagation')`). 
+The prediction yielded clustering structures with comparable fractions of explained variance and comparable cluster sizes in the training TCGA KIRC collective and the test cohorts indicative of high reproducibility of the clustering procedure (__Supplementary Figure S\@ref(fig:fig-semi-clust)A__).
+
+## Immune cell infiltration, clinical features and survival in the clusters
+
+xCell estimates of non-malignant cell infiltration [@Aran2017] were compared between the chemokine high and low clusters by Mann-Whitney U test with FDR correction for multiple testing. 
+Differences in distribution of tumor stages (TCGA KIRS, E-MTAB 1980, GSE73731, GSE73731, RECA-EU), MSKCC risk strata (CheckMate) and frequencies of best overall therapy response (complete/partial response versus stable/progressive disease, CheckMate cohorts) between the chemokine clusters were compared by $\chi^2$ test with FDR adjustment for multiple testing. 
+The comparisons were done with the `compare_variables()` function (_ExDA_ package). 
+Differences in overall and relapse-free survival between the clusters were assessed by Peto-Peto test (functions `surv_fit()` and `surv_pvalue(method = 'S1')`, package _survminer_) [@Kassambara2016].
+
+## Differences in Reactome pathways, gene expression and signaling modulation between the clusters
+
+ssGSEA scores for Reactome pathway gene signatures were calculated for single cancer samples with the `calculate()` method (package _gseaTools_ implementing the original _GSVA_ algorithm) [@Hanzelmann2013]. 
+Differences in ssGSEA scores between the chemokine high and low clusters were investigated by FDR-adjusted two-tailed T test (`test_two_groups()`, package _microViz_) [@Benjamini1995]. 
+The full Reactome pathway signature analysis results are provided in __Supplementary Table S\@ref(tab:tab-reactome)__. 
+
+Genes differentially expressed between the clusters were identified by FDR-corrected two-tailed T test (function `test_two_groups()`, package _microViz_) [@Benjamini1995] and > 1.25 fold-regulation in the chemokine high cluster as compared with the chemokine low cluster. 
+Numbers of differentially regulated genes are presented in __Supplementary Table S\@ref(tab:tab-n-dge)__. 
+The significantly regulated genes are listed in __Supplementary Table S\@ref(tab:tab-dge-gene)__. 
+
+Differential modulation of KEGG-listed signaling pathways in chemokine high versus chemokine low cluster cancers based on the regulation estimates for differentially expressed genes was investigated with _SPIA_ [@Tarca2009]. 
+Significantly activated or inhibited pathways were identified by combined significance for gene set enrichment and net pathway regulation (pG) corrected for multiple testing with FDR method. 
+The tA metric representing the total pathway perturbation was used as an estimate of magnitude of pathway modulation [@Tarca2009; @Benjamini1995]. 
+Signaling pathways with predicted significant modulation in the chemokine high cluster are listed in __Supplementary Table S\@ref(tab:tab-spia)__.
+
+## Biochemical reaction modulation in the CXCL9 expression strata
+
+Rules of assignment of genes to biochemical reactions were retrieved from the Recon2 human metabolism model available via the BiGG database [@King2016] and the R package _BiGGR_ [@Gavai2015]. 
+Estimates of differential expression between chemokine high and chemokine low cluster cancers for all available genes in each cohort were obtained by two-tailed T test as described above. 
+Estimates of biochemical reaction fold-regulation were computed by evaluation of the gene assignment rules following the 'gene - protein - reaction' (GPR) principle. 
+The 'gene~A~ OR gene~B~' operator was interpreted as the arithmetic mean of gene A and gene B estimates of differential expression. 
+The 'gene~A~ AND gene~B~' operator was interpreted as the minimum of gene A and gene B estimates of differential expression [@Gavai2015]. 
+Standard deviation, 95% confidence intervals and p values for the predicted reaction regulation estimates were obtained by a Monte Carlo simulation with n = 1000 draws from normal distribution of gene expression regulation estimates (mean: differential expression estimate, standard deviation: standard error of the differential expression estimate) [@Gavai2015]. 
+The metabolic models were created with the `build_geneSBML()` function (package _biggrExtra_). 
+Reaction activity regulation estimates were extracted from the models with the `components()` method (package _biggrExtra_). 
+Mappings of genes to reactions and reactions to metabolism Recon model subsystems were retrieved with the `extract_genes()` and `extract_subsystems()` functions, respectively (package _biggrExtra_). 
+Reaction names were annotated with the `annotate_bigg()` function (package _biggrExtra_). 
+Biochemical reactions with predicted significant modulation in the chemokine high versus chemokine low cluster are listed in __Supplementary Table S\@ref(tab:tab-reacts)__. 
+
+## Data and code availability
+
+Data analyzed within the study are publicly available. 
+The study analysis pipeline is available at https://github.com/PiotrTymoszuk/lymphokine_RCC.
+
+\newpage
+
+# Supplementary Tables
+
+```{r tab-reactome, tab.cap = 'Reactome signatures differentially regulated between the chemokine clusters (chemokine high vs low). The table is available as a supplementary Excel file.'}
+
+suppl_tables$reactome[1, 1] %>% 
+  mutate(Cohort = '') %>% 
+  set_names(c(' ')) %>% 
+  flextable
+
+```
+
+
+\newpage
+
+```{r tab-n-dge, tab.cap = 'Numbers of genes differentially regulated between the chemokine clusters (chemokine high vs low).'}
+
+flextable::flextable(suppl_tables$n_dge) %>% 
+  flextable::width(1, width = 3, unit = 'cm') %>% 
+  flextable::width(2:3, width = 3.5, unit = 'cm') %>% 
+  theme_vanilla
+
+```
+
+\newpage
+
+```{r tab-dge-gene, tab.cap = 'Genes differentially regulated between the chemokine clusters (chemokine high vs low). The table is available as a supplementary Excel file.'}
+
+suppl_tables$dge_genes[1, 1] %>% 
+  mutate(Cohort = '') %>% 
+  set_names(c(' ')) %>% 
+  flextable
+
+```
+
+
+```{r tab-spia, tab.cap = 'Genes differentially regulated between the chemokine clusters (chemokine high vs low). The table is available as a supplementary Excel file.'}
+
+suppl_tables$spia[1, 1] %>% 
+  mutate(Cohort = '') %>% 
+  set_names(c(' ')) %>% 
+  flextable
+
+```
+
+```{r tab-reacts, tab.cap = 'Recon model metabolic reactions predicted to be significantly modulated between the chemokine clusters (chemokine high vs low). The table is available as a supplementary Excel file.'}
+
+suppl_tables$reacts[1, 1] %>% 
+  mutate(Cohort = '') %>% 
+  set_names(c(' ')) %>% 
+  flextable
+
+```
+
+\newpage
+
+# Supplementary Figures
+
+```{r fig-chemo-screen, fig.width = mm_inch(suppl_figures$chemo_screen$w), fig.height = mm_inch(suppl_figures$chemo_screen$h), fig.cap = 'Screening for tumor-expressed chemokines involved in CD8^+^ T cell recruitment in the TCGA KIRC cohort.'}
+
+suppl_figures$chemo_screen$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-chemo-screen). Screening for tumor-expressed chemokines involved in CD8^+^ T cell recruitment in the TCGA KIRC cohort.__ 
+
+_(A) Differences in log~2~-transformed expression of chemokine genes between the RCC and normal kidney tissue investigated in donor-matched tissue specimens by paired two-tailed T test. Expression regulation false discovery rate (FDR) corrected significance and fold-regulation estimates in RCC as compared with the normal kidney are presented in a volcano plot. The strongest regulated genes are labeled. The chemokine genes of interest investigated in more detail in the current report are highlighted in bold. The number of RCC - normal kidney pairs is presented next to the plot._
+
+_(B) Correlation of log~2~-transformed chemokine gene expression with CD8^+^ T cell levels in the RCC tissue predicted by the QuanTIseq algorithm was analyzed by FDR-corrected Spearman test. $\rho$ correlation coefficients with 95% confidence intervals (CI) are shown in a Forest plot. The chemokine genes of interest investigated in more detail in the current report are highlighted in bold. The observation number is indicated in the plot caption._
+
+\newpage
+
+```{r fig-xcell1, fig.width = mm_inch(suppl_figures$xcell1$w), fig.height = mm_inch(suppl_figures$xcell1$h), fig.cap = 'Correlation of expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors with non-malignant cell population content predicted by the xCell algorithm in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.'}
+
+suppl_figures$xcell1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-xcell1). Correlation of expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors with non-malignant cell population content predicted by the xCell algorithm in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.__ 
+
+_Correlation of log~2~-transformed gene expression with non-malignant cell levels in the RCC tissue predicted by the xCell algorithm was analyzed by FDR-corrected Spearman test. $\rho$ correlation coefficients for significant correlations are presented as points in bubble plots. Point size corresponds to the absolute value of $\rho$, point color cores for the $\rho$ value. Numbers of complete observations are indicated in the plot captions._
+_T: T cells; n: naive; m: memory; em: effector memory; cm: central memory; Th1: T helper 1; Th2: T helper 2; Treg: regulatory T cells; NKT: natural killer T cells; NK: natural killer cells; B: B cells; switch Bm: class-switched memory B cells; mDC: myeloid dendritic cells; act mDC: activated mDC; pDC: plasmacytoid dendritic cells; Neutro: neutrophils; Eosino: eosinophils; MC: mast cells; Mono: monocytes; TAM: tumor-associated macrophages; EC: endothelial cells; CAF: cancer-associated fibroblasts._
+
+\newpage
+
+```{r fig-xcell2, fig.width = mm_inch(suppl_figures$xcell2$w), fig.height = mm_inch(suppl_figures$xcell2$h), fig.cap = 'Correlation of expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors with non-malingant cell population content predicted by the xCell algorithm in the RECA-EU, CheckMate010 and CheckMate025 cohorts.'}
+
+suppl_figures$xcell2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-xcell2). Correlation of expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors with non-malingant cell population content predicted by the xCell algorithm in the RECA-EU, CheckMate010 and CheckMate025 cohorts.__ 
+
+_Correlation of log~2~-transformed gene expression with non-malignant cell levels in the RCC tissue predicted by the xCell algorithm was analyzed by FDR-corrected Spearman test. $\rho$ correlation coefficients for significant correlations are presented as points in bubble plots. Point size corresponds to the absolute value of $\rho$, point color cores for the $\rho$ value. Numbers of complete observations are indicated in the plot captions._
+_T: T cells; n: naive; m: memory; em: effector memory; cm: central memory; Th1: T helper 1; Th2: T helper 2; Treg: regulatory T cells; NKT: natural killer T cells; NK: natural killer cells; B: B cells; switch Bm: class-switched memory B cells; mDC: myeloid dendritic cells; act mDC: activated mDC; pDC: plasmacytoid dendritic cells; Neutro: neutrophils; Eosino: eosinophils; MC: mast cells; Mono: monocytes; TAM: tumor-associated macrophages; EC: endothelial cells; CAF: cancer-associated fibroblasts; CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-quantiseq1, fig.width = mm_inch(suppl_figures$quantiseq1$w), fig.height = mm_inch(suppl_figures$quantiseq1$h), fig.cap = 'Correlation of expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors with immune cell population content predicted by the QuanTIseq algorithm in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.'}
+
+suppl_figures$quantiseq1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-quantiseq1). Correlation of expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors with immune cell population content predicted by the QuanTIseq algorithm in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.__ 
+
+_Correlation of log~2~-transformed gene expression with immune cell levels in the RCC tissue predicted by the QuanTIseq algorithm was analyzed by FDR-corrected Spearman test. $\rho$ correlation coefficients for significant correlations are presented as points in bubble plots. Point size corresponds to the absolute value of $\rho$, point color cores for the $\rho$ value. Numbers of complete observations are indicated in the plot captions._ 
+_T: T cells; Treg: regulatory T cells; NK: natural killer cells; B: B cells; mDC: myeloid dendritic cells; Neutro: neutrophils; Mono: monocytes; TAM: tumor-associated macrophages; rest: remainder uncharacterized cells._ 
+
+\newpage
+
+```{r fig-quantiseq2, fig.width = mm_inch(suppl_figures$quantiseq2$w), fig.height = mm_inch(suppl_figures$quantiseq2$h), fig.cap = 'Correlation of expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors with immune cell population content predicted by the QuanTIseq algorithm in the RECA-EU, CheckMate010 and CheckMate025 cohorts.'}
+
+suppl_figures$quantiseq2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-quantiseq2). Correlation of expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors with immune cell population content predicted by the QuanTIseq algorithm in the RECA-EU, CheckMate010 and CheckMate025 cohorts.__ 
+
+_Correlation of log~2~-transformed gene expression with immune cell levels in the RCC tissue predicted by the QuanTIseq algorithm was analyzed by FDR-corrected Spearman test. $\rho$ correlation coefficients for significant correlations are presented as points in bubble plots. Point size corresponds to the absolute value of $\rho$, point color cores for the $\rho$ value. Numbers of complete observations are indicated in the plot captions._ 
+_T: T cells; Treg: regulatory T cells; NK: natural killer cells; B: B cells; mDC: myeloid dendritic cells; Neutro: neutrophils; Mono: monocytes; TAM: tumor-associated macrophages; rest: remainder uncharacterized cells; CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._ 
+
+\newpage
+
+```{r fig-clust-training, fig.width = mm_inch(suppl_figures$clust_training$w), fig.height = mm_inch(suppl_figures$clust_training$h), fig.cap = 'Definition of the chemokine clusters in the TCGA KIRC cohort.'}
+
+suppl_figures$clust_training$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-clust-training). Definition of the chemokine clusters in the TCGA KIRC cohort.__ 
+
+_Chemokine clusters of RCC samples were defined in the TCGA KIRC training cohort in respect to normalized log~2~-transformed expression of CXCL9/10/11, CXCR3, CXCL13, XCL1 and XCR1 using the PAM algorithm with cosine distance between the cancer samples. The total number of cancer samples is indicated in (A)._
+
+_(A) Comparison of performance of various clustering algorithms (PAM: partition around medoids; HCL: hierarchical clustering; KMEANS, k = 2 clusters specified for each procedure) and distance metrics (Euclidean, Manhattan and cosine). Clustering structure reproducibility was measured by accuracy of cluster assignment in 10-fold cross-validation. Explanatory performance was measured by fraction of explained clustering variance (ratio of between-cluster sum of squares to total sum of squares). Note superior reproducibility and good explanatory performance of the PAM/cosine distance algorithm._
+
+_(B) Choice of the cluster number for the PAM/cosine distance algorithm based on the bend of the within-cluster sum of square curve (WSS curve, left) and the peak mean silhouette statistic (right)._
+
+_(C) Separation between the chemokine clusters defined in the TCGA KIRC cohort by the PAM/cosine distance algorithm investigated by a heat map of distances between the cancer sample pairs. Numbers of observations assigned to the chemokine (chemox) high and chemokine low clusters is indicated next to the heat map._
+
+\newpage
+
+```{r fig-semi-clust, fig.width = mm_inch(suppl_figures$semi_clust$w), fig.height = mm_inch(suppl_figures$semi_clust$h), fig.cap = 'Semi-supervised clustering of cancer samples by the chemokine gene expression. Expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors in the chemokine clusters, CheckMate cohorts.'}
+
+suppl_figures$semi_clust$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-semi-clust). Semi-supervised clustering of cancer samples by the chemokine gene expression. Expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors in the chemokine clusters, CheckMate cohorts.__ 
+
+_Chemokine clusters of RCC samples were defined in the TCGA KIRC training cohort in respect to normalized log~2~-transformed expression of CXCL9/10/11, CXCR3, CXCL13, XCL1 and XCR1 using the PAM algorithm with cosine distance between the cancer samples. Prediction of cluster assignment in the E-MTAB 1980, GSE73731, GSE167093, RECA-EU, CheckMate 010 (CM 010), CheckMate 025 everolimus (CM 025 EVER) and CheckMate 025 nivolumab (CM 025 NIVO) was done with the inverse distance-weighted 15-nearest neighbor (15-NN) classifier._ 
+
+_(A) Explanatory performance of the clustering assignment expressed as fraction of explained clustering variance (ratio of between-cluster sum of squares to total sum of squares, left) and fraction of the cohort's cancer samples assigned to the chemokine (chemox) low and high clusters (right). Numbers of cancer samples are indicated in the Y axes._
+
+_(B) Normalized log~2~ transformed expression of the clustering genes in the chemokine clusters of the CheckMate cohorts. Differences in expression were assessed by false discovery rate (FDR) corrected two-tailed T test. Mean normalized expression values are visualized as thick lines, tinted regions represent two standard errors of the mean (SEM). P values are shown in the Y axis. Numbers of cancer samples assigned to the clusters are displayed in the plot captions._
+
+\newpage
+
+```{r fig-clust-infil, fig.width = mm_inch(suppl_figures$clust_infil$w), fig.height = mm_inch(suppl_figures$clust_infil$h), fig.cap = 'Predicted infiltration of T cells, activated mDC and TAM in the chemokine clusters, CheckMate cohorts.'}
+
+suppl_figures$clust_infil$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-clust-infil). Predicted infiltration of T cells, activated mDC and TAM in the chemokine clusters, CheckMate cohorts.__ 
+
+_Differences in levels of effector memory CD8^+^ T (CD8^+^ Tem), central memory CD8^+^ T (CD8^+^ Tcm), memory CD4^+^ T (CD4^+^ Tm), effector memory CD4^+^ T cells (CD4^+^ Tem), activated myeloid dendritic cells (act mDC), M1 and M2 tumor-associated macrophages (TAM) between the chemokine (chemox) high and chemokine low cluster were assessed by false discovery rate (FDR) corrected Mann-Whitney test. Median normalized infiltration levels with interquartile ranges (IQR) are presented as boxes, whiskers span over the 150% IQR. Points represent single cancer samples. P values are indicated in the Y axes, significant effects are highlighted in bold. Numbers of cancer samples assigned to the chemokine high and low clusters are displayed in the plot captions. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-stage, fig.width = mm_inch(suppl_figures$stage$w), fig.height = mm_inch(suppl_figures$stage$h), fig.cap = 'Distribution of tumor stages and MSKCC risk strata in the chemokine clusters.'}
+
+suppl_figures$stage$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-stage). Distribution of tumor stages and MSKCC risk strata in the chemokine clusters.__ 
+
+_Differences in distribution of tumor stages (A) and MSKCC risk strata (B) between the chemokine (chemox) high and low clusters cancer samples were assessed by false discovery rate (FDR) corrected $\chi^2$ test and Cramer V effect size statistic. Effect sizes and p values are displayed in the plot captions, numbers of cancer samples assigned to the chemokine clusters are indicated in the plot x axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-response, fig.width = mm_inch(suppl_figures$response$w), fig.height = mm_inch(suppl_figures$response$h), fig.cap = 'Therapy response rates in the chemokine clusters in the CheckMate cohorts.'}
+
+suppl_figures$response$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-response). Therapy response rates in the chemokine clusters in the CheckMate cohorts.__ 
+
+_Differences in therapy response rates (complete/partial response [CR/PR] versus stable/progressive disease [SD/PD]) between the chemokine (chemox) high and low clusters cancer samples were assessed by false discovery rate (FDR) corrected $\chi^2$ test and Cramer V effect size statistic. Effect sizes and p values are displayed in the plot captions, numbers of cancer samples assigned to the chemokine clusters are indicated in the plot x axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-clust-rfs, fig.width = mm_inch(suppl_figures$clust_rfs$w), fig.height = mm_inch(suppl_figures$clust_rfs$h), fig.cap = 'Relapse-free survival in the chemokine clusters.'}
+
+suppl_figures$clust_rfs$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-clust-rfs). Relapse-free survival in the chemokine clusters.__ 
+
+_Differences in relapse-free survival between the chemokine (chemox) high and low cluster RCC patients were investigated by false discovery rate (FDR) corrected Peto-Peto test. Fractions of relapse-free patients are visualized in Kaplan-Meier plots. Uncorrected and FDR-corrected p values are displayed in the plots. Number of complete observations and relapses (events) are displayed in the plot captions, numbers of patients in the clusters are indicated under the plots. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-os1, fig.width = mm_inch(suppl_figures$os1$w), fig.height = mm_inch(suppl_figures$os1$h), fig.cap = 'Modeling of overall survival as a function of cancer expression of CXCL9/10/11 and CXCR3.'}
+
+suppl_figures$os1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-os1). Modeling of overall survival as a function of cancer expression of *CXCL9/10/11* and *CXCR3*.__ 
+
+_Correlation of log~2~-transformed gene expression with survival was investigated with a series of uni-variable Cox regression models. Linear and spline terms of gene expression were included in the models. Hazard ratio (HR) estimates for the linear gene expression terms with 95% confidence intervals (CI) are presented in Forest plots. Point color codes for significance and sign of correlation with survival. Total numbers of patients and deaths are indicated in the Y axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-os2, fig.width = mm_inch(suppl_figures$os2$w), fig.height = mm_inch(suppl_figures$os2$h), fig.cap = 'Modeling of overall survival as a function of cancer expression of CXCL13, CXCR5, XCL1 and XCR1.'}
+
+suppl_figures$os2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-os2). Modeling of overall survival as a function of cancer expression of *CXCL13*, *CXCR5*, *XCL1* and *XCR1*.__ 
+
+_Correlation of log~2~-transformed gene expression with survival was investigated with a series of uni-variable Cox regression models. Linear and spline terms of gene expression were included in the models. Hazard ratio (HR) estimates for the linear gene expression terms with 95% confidence intervals (CI) are presented in Forest plots. Point color codes for significance and sign of correlation with survival. Total numbers of patients and deaths are indicated in the Y axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-rfs1, fig.width = mm_inch(suppl_figures$rfs1$w), fig.height = mm_inch(suppl_figures$rfs1$h), fig.cap = 'Modeling of relapse-free survival as a function of cancer expression of CXCL9/10/11 and CXCR3.'}
+
+suppl_figures$rfs1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-rfs1). Modeling of relapse-free survival as a function of cancer expression of *CXCL9/10/11* and *CXCR3*.__ 
+
+_Correlation of log~2~-transformed gene expression with survival was investigated with a series of uni-variable Cox regression models. Linear and spline terms of gene expression were included in the models. Hazard ratio (HR) estimates for the linear gene expression terms with 95% confidence intervals (CI) are presented in Forest plots. Point color codes for significance and sign of correlation with survival. Total numbers of patients and relapses are indicated in the Y axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-rfs2, fig.width = mm_inch(suppl_figures$rfs2$w), fig.height = mm_inch(suppl_figures$rfs2$h), fig.cap = 'Modeling of relapse-free survival as a function of cancer expression of CXCL13, CXCR5, XCL1 and XCR1.'}
+
+suppl_figures$rfs2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-rfs2). Modeling of relapse-free survival as a function of cancer expression of *CXCL13*, *CXCR5*, *XCL1* and *XCR1*.__ 
+
+_Correlation of log~2~-transformed gene expression with survival was investigated with a series of uni-variable Cox regression models. Linear and spline terms of gene expression were included in the models. Hazard ratio (HR) estimates for the linear gene expression terms with 95% confidence intervals (CI) are presented in Forest plots. Point color codes for significance and sign of correlation with survival. Total numbers of patients and relapses are indicated in the Y axes. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+```{r fig-multi-os, fig.width = mm_inch(suppl_figures$multi_os$w), fig.height = mm_inch(suppl_figures$multi_os$h), fig.cap = 'Multi-parameter modeling of overall survival as a function of gene expression, demographic and staging data.'}
+
+suppl_figures$multi_os$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-multi-os). Multi-parameter modeling of overall survival as a function of gene expression, demographic and staging data.__ 
+
+_Association of age, sex, tumor grade, tumor and metastasis stage, and expression of CXCL9/10/11, CXCR3, CXCL13, CXCR5, XCL1, XCR1 with overall survival was assessed by multi-parameter Ridge Cox regression. Two Ridge models were trained in the TCGA KIRC cohort: a model with the demographic, clinical and gene of interest expression data and a model with the demographic and clinical data only. Performance of the models was subsequently validated in the E-MTAB 1980 and RECA-EU cohort._
+
+_(A) Hazard ratio (HR) estimates of the full demographic/clinical/gene expression data Ridge model in the TCGA KIRC cohort presented in a bubble plot. Point size corresponds to the absolute value of log HR, point color codes for the correlation sign (red: unfavorable, blue: favorable association with survival)._
+
+_(B) Concordance (C) indexes with 95% confidence intervals (CI) for the demographic/clinical and the demographic/clinical/gene expression survival models in the training TCGA KIRC cohort, and the validation RECA-EU and E-MTAB 1980 collectives. The results are presented in a Forest plot. Numbers of patients and deaths are indicated in the Y axis._
+
+\newpage
+
+```{r fig-signaling, fig.width = mm_inch(suppl_figures$signaling$w), fig.height = mm_inch(suppl_figures$signaling$h), fig.cap = 'Predicted activation of signaling pathways in the chemokine high versus chemokine low cluster.'}
+
+suppl_figures$signaling$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-signaling). Predicted activation of signaling pathways in the chemokine high versus chemokine low cluster.__ 
+
+_Modulation of KEGG-listed signaling pathways based on differential gene expression in the chemokine (chemox) high and chemokine low cluster cancers was investigated with the SPIA algorithm. Pathways found to be significantly modulated in all study collectives except for the smallest CheckMate 010 cohort (n = `r length(dge_spia$common_pathways$activated)`) were identified.  The tA metric activity regulation estimates (chemokine high versus chemokine low cluster) for the significantly regulated pathways are presented in a bubble plot. Point size corresponds to the absolute value of tA, point color codes for the tA value. Points are labeled with their tA values. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-ifn1, fig.width = mm_inch(suppl_figures$ifn1$w), fig.height = mm_inch(suppl_figures$ifn1$h), fig.cap = 'Differential expression of interferon gamma signaling-associated genes between the chemokine clusters in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.'}
+
+suppl_figures$ifn1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-ifn1). Differential expression of interferon gamma signaling-associated genes between the chemokine clusters in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.__ 
+
+_Genes differentially expressed in the chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test and the > 1.25 fold regulation cutoff. Significance and fold-regulation estimates for genes associated with interferon alpha/beta and interferon gamma Reactome pathways are presented in volcano plots. Points represent single genes, point color codes for the regulation sign. The significance and fold regulation cutoffs are visualized as dashed lines. Top significantly regulated genes are labeled with their symbols. Numbers of significantly up- and downregulated genes are displayed in the plot captions._
+
+\newpage
+
+```{r fig-ifn2, fig.width = mm_inch(suppl_figures$ifn2$w), fig.height = mm_inch(suppl_figures$ifn2$h), fig.cap = 'Differential expression of interferon gamma signaling-associated genes between the chemokine clusters in the CheckMate cohorts.'}
+
+suppl_figures$ifn2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-ifn2). Differential expression of interferon gamma signaling-associated genes between the chemokine clusters in the CheckMate cohorts.__ 
+
+_Genes differentially expressed in the chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test and the > 1.25 fold regulation cutoff. Significance and fold-regulation estimates for genes associated with interferon alpha/beta and interferon gamma Reactome pathways are presented in volcano plots. Points represent single genes, point color codes for the regulation sign. The significance and fold regulation cutoffs are visualized as dashed lines. Top significantly regulated genes are labeled with their symbols. Numbers of significantly up- and downregulated genes are displayed in the plot captions. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-exhaustion1, fig.width = mm_inch(suppl_figures$exhaustion1$w), fig.height = mm_inch(suppl_figures$exhaustion1$h), fig.cap = 'Differential expression of T cell exhaustion-associated genes between the chemokine clusters in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.'}
+
+suppl_figures$exhaustion1$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-exhaustion1). Differential expression of T cell exhaustion-associated genes between the chemokine clusters in the TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093 cohorts.__ 
+
+_Genes differentially expressed in the chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test and the > 1.25 fold regulation cutoff. Significance and fold-regulation estimates for genes associated with T cell exhaustion are presented in volcano plots. Points represent single genes, point color codes for the regulation sign. The significance and fold regulation cutoffs are visualized as dashed lines. Top significantly regulated genes are labeled with their symbols. Numbers of significantly up- and downregulated genes are displayed in the plot captions._
+
+\newpage
+
+```{r fig-exhaustion2, fig.width = mm_inch(suppl_figures$exhaustion2$w), fig.height = mm_inch(suppl_figures$exhaustion2$h), fig.cap = 'Differential expression of T cell exhaustion-associated genes between the chemokine clusters in the CheckMate cohorts.'}
+
+suppl_figures$exhaustion2$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-exhaustion2). Differential expression of T cell exhaustion-associated genes between the chemokine clusters in the CheckMate cohorts.__ 
+
+_Genes differentially expressed in the chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test and the > 1.25 fold regulation cutoff. Significance and fold-regulation estimates for genes associated with T cell exhaustion are presented in volcano plots. Points represent single genes, point color codes for the regulation sign. The significance and fold regulation cutoffs are visualized as dashed lines. Top significantly regulated genes are labeled with their symbols. Numbers of significantly up- and downregulated genes are displayed in the plot captions. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-checkpoint, fig.width = mm_inch(suppl_figures$checkpoint$w), fig.height = mm_inch(suppl_figures$checkpoint$h), fig.cap = 'Differential expression of genes coding for clinically relevant immune checkpoint proteins in the chemokine clusters in the CheckMate cohorts.'}
+
+suppl_figures$checkpoint$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-checkpoint). Differential expression of genes coding for clinically relevant immune checkpoint proteins in the chemokine clusters in the CheckMate cohorts.__ 
+
+_Genes differentially expressed in chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test. Results for clinically relevant immune checkpoint genes are presented. Median normalized log~2~ expression levels with interquartile ranges (IQR) are presented as boxes, whiskers span over the 150% IQR. Points represent single cancer samples. P values are indicated in the Y axes, significant effects are highlighted with bold. Numbers of cancer samples assigned to the chemokine high and low clusters are displayed in the plot captions. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-fao, fig.width = mm_inch(suppl_figures$fao$w), fig.height = mm_inch(suppl_figures$fao$h), fig.cap = 'Predicted differences in activity of fatty acid oxidation reactions between the chemokine clusters.'}
+
+suppl_figures$fao$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-fao). Predicted differences in activity of fatty acid oxidation reactions between the chemokine clusters.__ 
+
+_Regulation of the Recon human metabolism model reactions in chemokine (chemox) high versus chemokine low cluster cancers was predicted based on the differential gene expression with the BiGGR and biggrExtra package tools. Significance of the metabolic reaction regulation was assessed by Monte Carlo simulation and corrected for multiple testing with the false discovery rate (FDR) method. Predicted fold-regulation estimates for fatty acid oxidation reactions (FAO, total reactions: n = `r meta_plots$subsystem_n$tcga %>% filter(subsystem == 'fatty_acid_oxidation') %>% .$n_total`) in the chemokine high versus chemokine low cluster are presented in bar plots. Bar color codes for significance and the regulation sign. Numbers of significantly activated and inhibited FAO reactions are displayed in the plot captions. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-tca, fig.width = mm_inch(suppl_figures$tca$w), fig.height = mm_inch(suppl_figures$tca$h), fig.cap = 'Predicted differences in activity of citric acid cycle reactions between the chemokine clusters.'}
+
+suppl_figures$tca$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-tca). Predicted differences in activity of citric acid cycle reactions between the chemokine clusters.__ 
+
+_Regulation of the Recon human metabolism model reactions in chemokine high versus chemokine low cluster cancers was predicted based on the differential gene expression with the BiGGR and biggrExtra package tools. Significance of the metabolic reaction regulation was assessed by Monte Carlo simulation and corrected for multiple testing with the false discovery rate (FDR) method. Predicted fold-regulation estimates for subsequent citric acid cycle reactions (A) in the chemokine high versus chemokine low cluster are presented in bar plots (B). Bar color codes for significance and the regulation sign._
+_ACON: aconitase; ACON mito: mitochondrial aconitase; IDH/NAD: isocitrate dehydrogenase - NAD; IDH/NADP: isocitrate dehydrogenase - NADP; IDH/NADP mito: mitochondrial IDH/NADP; IDH/NADP+: oxalosuccinate:NADP+ oxidoreductase; OGDH: 2-oxoglutarate dehydrogenase; SCS/GTP: succinate -CoA ligase  GTP-forming; SCS/ATP: succinate-CoA ligase  ATP-forming; SDH: succinate dehydrogenase; FH: fumarase; FH mito: mitochondrial fumarase; MDH: malate dehydrogenase; MDH mito: mitochondrial malate dehydrogenase; CS: citrate synthase, CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-oxphos, fig.width = mm_inch(suppl_figures$oxphos$w), fig.height = mm_inch(suppl_figures$oxphos$h), fig.cap = 'Predicted differences in activity of oxidative phosphorylation complexes between the chemokine clusters.'}
+
+suppl_figures$oxphos$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-oxphos). Predicted differences in activity of oxidative phosphorylation complexes between the chemokine clusters.__ 
+
+_Regulation of the Recon human metabolism model reactions in chemokine high versus chemokine low cluster cancers was predicted based on the differential gene expression with the BiGGR and biggrExtra package tools. Significance of the metabolic reaction regulation was assessed by Monte Carlo simulation and corrected for multiple testing with the false discovery rate (FDR) method. Predicted fold-regulation estimates for subsequent oxidative phosphorylation (OxPhos) complexes in the chemokine high versus chemokine low cluster are presented in bar plots. Bar color codes for significance and the regulation sign. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-trycats, fig.width = mm_inch(suppl_figures$trycats$w), fig.height = mm_inch(suppl_figures$trycats$h), fig.cap = 'Predicted differences in activity of the tryptophan/kynurenine/quinolinate pathway between the chemokine clusters.'}
+
+suppl_figures$trycats$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-trycats). Predicted differences in activity of the tryptophan/kynurenine/quinolinate pathway between the chemokine clusters.__ 
+
+_Regulation of the Recon human metabolism model reactions in chemokine high versus chemokine low cluster cancers was predicted based on the differential gene expression with the BiGGR and biggrExtra package tools. Significance of the metabolic reaction regulation was assessed by Monte Carlo simulation and corrected for multiple testing with the false discovery rate (FDR) method._
+
+_(A) Pathway scheme. TRP: tryptophan; TDO: tryptophan 2,3-dioxygenase; KMO: kynurenine 3-monooxygenase; KYNU: kynureninase; KAT: kynurenin aminotransferase; HAAO: 3-hydroxyanthranilate 3,4-dioxygenase._
+
+_(B) Predicted fold-regulation estimates for the tryptophan - kynurenine - quinolinate pathway in the chemokine high versus chemokine low cluster presented in bar plots. Bar color codes for significance and the regulation sign. CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+```{r fig-trycats-genes, fig.width = mm_inch(suppl_figures$trycats_genes$w), fig.height = mm_inch(suppl_figures$trycats_genes$h), fig.cap = 'Differential expression of genes involved in the tryptophan/kynurenine/quinolinate metabolism in the chemokine clusters in the CheckMate cohorts.'}
+
+suppl_figures$trycats_genes$plot
+
+```
+
+__Supplementary Figure S\@ref(fig:fig-trycats-genes). Differential expression of genes involved in the tryptophan/kynurenine/quinolinate metabolism in the chemokine clusters in the CheckMate cohorts.__ 
+
+_Genes differentially expressed in chemokine (chemox) high versus chemokine low cancers were identified by false discovery rate (FDR) corrected two-tailed T test. Results for genes involved in the tryptophan - kynurenin - quinolinate metabolic pathway are presented. Median normalized log~2~ expression levels with interquartile ranges (IQR) are presented as boxes, whiskers span over the 150% IQR. Points represent single cancer samples. P values are indicated in the Y axes, significant effects are highlighted on bold. Numbers of cancer samples assigned to the chemokine high and low clusters are displayed in the plot captions. IDO: indoleamine 2,3-dioxygenase; TDO: tryptophan 2,3-dioxygenase; KYAT1: kynurenine—oxoglutarate transaminase 1; KYNU: kynureninase; KMO: kynurenine 3-monooxygenase; KAT: kynurenin aminotransferase; HAAO: 3-hydroxyanthranilate 3,4-dioxygenase; CM 010: CheckMate 010; CM 025 EVER: CheckMate 025 everolimus; CM 025 NIVO: CheckMate 025 nivolumab._
+
+\newpage
+
+# References
