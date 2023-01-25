@@ -82,6 +82,15 @@
     map(mutate,
         pt_stage = stri_extract(pt_stage, regex = '^T\\d{1}'),
         pt_stage = factor(pt_stage, c('T1', 'T2', 'T3', 'T4')))
+  
+  cohort$analysis_tbl[c('cm10', 'cm25ev', 'cm25ni')] <- 
+    cohort$analysis_tbl[c('cm10', 'cm25ev', 'cm25ni')] %>% 
+    map(mutate, 
+        response_type = car::recode(response_type, 
+                                    "'CR' = 'yes'; 'PR' = 'yes'; 
+                                       'CRPR' = 'yes'; 'SD' = 'no'; 
+                                       'PD' = 'no'"), 
+        response_type = factor(response_type, c('no', 'yes')))
 
 # analysis -----
 

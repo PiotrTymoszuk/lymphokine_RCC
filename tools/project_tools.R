@@ -9,6 +9,9 @@
   library(ggrepel)
   library(survival)
   library(coxExtensions)
+  library(igraph)
+  library(network)
+  library(ggnetwork)
 
 # annotation functions -----
 
@@ -198,7 +201,8 @@
                        plot_tag = NULL, 
                        point_size = 2, 
                        point_circle = 'none', 
-                       txt_size = 2.6) {
+                       txt_size = 2.6, 
+                       nearest_only = TRUE) {
     
     ## plots the MDS layout with the genes of interest labeled
     ## along with their nearest immune neighbors
@@ -206,7 +210,8 @@
     ## NN labels
     
     knn_labels <- knn_data %>% 
-      mutate(knn = map(knn, exchange, 
+      mutate(knn = map(knn, 
+                       exchange, 
                        dict = variable_lexicon, 
                        key = 'variable', 
                        value = 'label'))
@@ -234,7 +239,15 @@
                                     nearest, 
                                     interest_name), 
              fontface = ifelse(interest == 'yes', 
-                               'italic', 'plain'))
+                               'italic', 'plain'), 
+             point_alpha = ifelse(is.na(interest_name), 'low', 'high'))
+    
+    if(nearest_only) {
+      
+      plot_tbl <- plot_tbl %>% 
+        filter(!is.na(interest_name))
+      
+    }
     
     if(is.null(plot_tag)) {
       
@@ -249,7 +262,8 @@
       mds_plot <- plot_tbl %>% 
         ggplot(aes(x = comp_1, 
                    y = comp_2, 
-                   color = interest)) + 
+                   color = interest, 
+                   alpha = point_alpha)) + 
         geom_point(shape = 16, 
                    size = point_size)
       
@@ -258,7 +272,8 @@
       mds_plot <- plot_tbl %>% 
         ggplot(aes(x = comp_1, 
                    y = comp_2, 
-                   fill = interest)) + 
+                   fill = interest, 
+                   alpha = point_alpha)) + 
         geom_point(shape = 21, 
                    color = point_circle, 
                    size = point_size)
@@ -270,12 +285,15 @@
                           color = interest, 
                           fontface = fontface), 
                       size = txt_size) + 
-      scale_fill_manual(values = c(no = 'steelblue3', 
+      scale_fill_manual(values = c(no = 'steelblue4', 
                                    yes = 'firebrick4')) +
-      scale_color_manual(values = c(no = 'steelblue3', 
+      scale_color_manual(values = c(no = 'steelblue4', 
                                     yes = 'firebrick4')) + 
+      scale_alpha_manual(values = c(high = 1, 
+                                    low = 0.25)) + 
       guides(fill = 'none', 
-             color = 'none') + 
+             color = 'none', 
+             alpha = 'none') + 
       globals$common_theme + 
       labs(title = plot_title, 
            subtitle = plot_subtitle, 
@@ -284,6 +302,111 @@
            y = 'MDS 2')
     
     return(mds_plot)
+    
+  }
+  
+  forced_netgraph <- function(data, 
+                              corr_limit = 0.4, 
+                              cell_subset = globals$xcell_lexicon$variable, 
+                              gene_subset = globals$cxcl_genes, 
+                              weighting_order = 1, 
+                              gene_color = 'coral3', 
+                              cell_color = 'steelblue', 
+                              txt_size = 2.75, 
+                              plot_title = NULL, 
+                              plot_subtitle = NULL, 
+                              cust_theme = theme_blank()) {
+    
+    ## creates a force-directed graph of a min/max scaled Spearman's 
+    ## correlation matrix
+    ## for genes and cell types quantified by xCell
+    ##
+    ## data is a data frame with the expression levels and predicted 
+    ## infiltration quantities
+    ##
+    ## corr_limit sets correlations below the cutoff to 0
+    ##
+    ## cell_subset tells which cell types will be plotted
+    ## gene_subset tells which genes will be plotted
+    ## 
+    ## weighting_order allows for quadratic, cubic etc. transformation 
+    ## of the scaled Spearman's correlation coefficient - this one codes 
+    ## for node alpha
+    ##
+    ## gene_color and cell_color define colors of the nodes representing 
+    ## genes and cells, respectively
+    
+    ## correlation matrix: min/max scaled Spearman's coefficient
+    ## squishing the correlations
+    
+    corr_mtx <- cor(data, method = 'spearman')
+    
+    corr_mtx <- (corr_mtx - min(corr_mtx))/(max(corr_mtx) - min(corr_mtx))
+    
+    corr_mtx[corr_mtx < corr_limit] <- 0
+    
+    ## variable lexicon
+    
+    var_lexicon <- rbind(globals$xcell_lexicon, 
+                         tibble(variable = globals$cxcl_genes, 
+                                label = globals$cxcl_genes))
+    
+    
+    
+    ## setting the cell populations and genes to be plotted
+    ## weighted graph with `graph_from_adjacency_matrix()`, package igraph
+    
+    plot_mtx <- corr_mtx[c(cell_subset, gene_subset), 
+                         c(cell_subset, gene_subset)]
+    
+    plot_graph <- graph_from_adjacency_matrix(plot_mtx, 
+                                              mode = 'undirected', 
+                                              diag = FALSE, 
+                                              weighted = TRUE) %>% 
+      set_vertex_attr(name = 'node_type', 
+                      value = c(rep('cell', length(cell_subset)), 
+                                rep('gene', length(gene_subset)))) %>% 
+      set_vertex_attr(name = 'font_type', 
+                      value = c(rep('plain', length(cell_subset)), 
+                                rep('italic', length(gene_subset)))) %>% 
+      set_vertex_attr(name = 'node_lab', 
+                      value = exchange(c(cell_subset, gene_subset), 
+                                       dict = var_lexicon, 
+                                       key = 'variable', 
+                                       value = 'label'))
+    
+    ## plotting 
+    
+    if(weighting_order == 1) {
+      
+      alpha_title <- 'scaled \u03C1'
+      
+    } else {
+      
+      alpha_title <- paste0('scaled \u03C1 <sup>', weighting_order, '</sup>')
+      
+    }
+    
+    ggplot(plot_graph, 
+           aes(x = x, y = y, xend = xend, yend = yend)) + 
+      geom_edges(aes(alpha = weight^weighting_order)) + 
+      geom_nodes(aes(color = node_type), 
+                 size = 3) + 
+      geom_nodetext_repel(aes(label = node_lab, 
+                              color = node_type, 
+                              fontface = font_type), 
+                          size = txt_size) + 
+      scale_color_manual(values = c(gene = gene_color, 
+                                    cell = cell_color)) + 
+      labs(title = plot_title, 
+           subtitle = plot_subtitle, 
+           color = 'feature type', 
+           alpha = alpha_title) + 
+      cust_theme + 
+      theme(legend.title = element_markdown(size = 8), 
+            legend.text = globals$common_text, 
+            plot.subtitle = globals$common_text, 
+            plot.title = element_text(size = 8, face = 'bold'))
     
   }
   

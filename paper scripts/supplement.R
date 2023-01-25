@@ -36,9 +36,43 @@
               w = 180, 
               h = 210)
   
-# Figures S2 - S3: infiltration, xCell --------
+# Figure S2: correlation with infiltration, networks, xcell -------
   
-  insert_msg('Figure S2 - S3: infiltration xCell')
+  insert_msg('Figure S2: correlation with infiltration, xcell')
+  
+  ## force directed plots for the major cohorts
+  
+  suppl_figures$xcell_net <- xcell_mds$fd_plots[c('cm10', 
+                                                  'cm25ev', 
+                                                  'cm25ni')] %>% 
+    map(~.x + 
+          scale_alpha_continuous(range = c(0.1, 0.25), 
+                                 limits = c(0.1, 0.8), 
+                                 oob = scales::squish) + 
+          scale_color_manual(labels = c(gene = 'gene', 
+                                        cell = 'cell neighbor, \u03C1 > 0.4'), 
+                             values = c(gene = 'firebrick4', 
+                                        cell = 'steelblue4')))
+  
+  suppl_figures$xcell_net <- suppl_figures$xcell_net %>% 
+    map(~.x + theme(legend.position = 'none')) %>% 
+    c(list(get_legend(suppl_figures$xcell_net[[1]]))) %>% 
+    plot_grid(plotlist = ., 
+              ncol = 2) %>% 
+    as_figure(label = 'figure_s2_infiltration_xcell', 
+              ref_name = 'xcell_net', 
+              caption = paste('Expression of CXCL9/10/11, CXCL13, XCL1', 
+                              'and their cognate receptors', 
+                              'in RCC samples enriched', 
+                              'in CD8^+^ and CD4^+^ T cells,', 
+                              'activated myeloid DC, TAM and B cells,', 
+                              'CheckMate cohorts.'), 
+              w = 180, 
+              h = 150)
+  
+# Figures S3 - S4: infiltration, xCell --------
+  
+  insert_msg('Figure S3 - S4: infiltration xCell')
   
   suppl_figures[c('xcell1', 'xcell2')] <- 
     list(xcell$heat_bubble[c('tcga', 'emtab1980', 'gse73731', 'gse167093')], 
@@ -61,8 +95,8 @@
   suppl_figures[c('xcell1', 'xcell2')] <- 
     suppl_figures[c('xcell1', 'xcell2')] %>% 
     list(x = ., 
-         label = c('figure_s2_xcell', 
-                   'figure_s3_xcell'), 
+         label = c('figure_s3_xcell', 
+                   'figure_s4_xcell'), 
          ref_name = c('xcell1', 'xcell2'), 
          caption = c(paste('Correlation of expression of CXCL9/10/11,', 
                            'CXCL13, XCL1 and their cognate receptors with', 
@@ -80,9 +114,9 @@
          w = 180, 
          h = 230)
   
-# Figures S4 - S5: infiltration, quanTIseq -------
+# Figures S5 - S6: infiltration, quanTIseq -------
   
-  insert_msg('Figures S4 - S5: infiltration, quanTIseq')
+  insert_msg('Figures S5 - S6: infiltration, quanTIseq')
   
   suppl_figures[c('quantiseq1', 'quantiseq2')] <- 
     list(quantiseq$heat_bubble[c('tcga', 'emtab1980', 'gse73731', 'gse167093')], 
@@ -106,8 +140,8 @@
   suppl_figures[c('quantiseq1', 'quantiseq2')] <- 
     suppl_figures[c('quantiseq1', 'quantiseq2')] %>% 
     list(x = ., 
-         label = c('figure_s4_quantiseq', 
-                   'figure_s5_quantiseq'), 
+         label = c('figure_s5_quantiseq', 
+                   'figure_s6_quantiseq'), 
          ref_name = c('quantiseq1', 'quantiseq2'), 
          caption = c(paste('Correlation of expression of CXCL9/10/11,', 
                            'CXCL13, XCL1 and their cognate receptors with', 
@@ -125,9 +159,22 @@
          w = 180, 
          h = 200)
   
-# Figure S6: cluster training -------
+# Figure S7: single cell RNA seq -------
   
-  insert_msg('Figure S6: training of the clusters')
+  insert_msg('Figure S7: scRNAseq')
+  
+  suppl_figures$scrna_seq <- 
+    plot_grid(ggdraw() + 
+                draw_image('./schemes/sc_rna_seq.png')) %>% 
+    as_figure(label = 'figure_s7_sc_rna_seq', 
+              ref_name = 'scrna_seq', 
+              caption = 'Method and sample flowchart of scRNA dataset.', 
+              w = 180, 
+              h = 4800/5417 * 180)
+  
+# Figure S8: cluster training -------
+  
+  insert_msg('Figure S8: training of the clusters')
   
   suppl_figures$clust_training <- 
     plot_grid(plot_grid(clust_dev$result_plot + 
@@ -165,16 +212,16 @@
               rel_heights = c(1.2, 1, 1), 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s6_lymphokine_cluster_training', 
+    as_figure(label = 'figure_s8_lymphokine_cluster_training', 
               ref_name = 'clust_training', 
               caption = paste('Definition of the lymphokine', 
                               'clusters in the TCGA KIRC cohort.'), 
               w = 180, 
               h = 230)
   
-# Figure S7: semi-supervised clustering -------
+# Figure S9: semi-supervised clustering -------
   
-  insert_msg('Figure S7: semi-supervised clustering')
+  insert_msg('Figure S9: semi-supervised clustering')
   
   ## upper panel with clustering variances
   ## and fractions of cancer samples in the clusters
@@ -225,7 +272,7 @@
               nrow = 2, 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s7_semisupervised_clustering', 
+    as_figure(label = 'figure_s9_semisupervised_clustering', 
               ref_name = 'semi_clust', 
               caption = paste('Semi-supervised clustering of cancer', 
                               'samples by the lymphokine gene expression.', 
@@ -235,9 +282,9 @@
               w = 180, 
               h = 180)
   
-# Figure S8: infiltration in the checkmate cohorts ------
+# Figure S10: infiltration in the checkmate cohorts ------
   
-  insert_msg('Figure S8: infiltration in the CheckMate cohorts')
+  insert_msg('Figure S10: infiltration in the CheckMate cohorts')
   
   suppl_figures$clust_infil <- gene_xcell$plots[c('cm10', 
                                                   'cm25ev', 
@@ -256,7 +303,7 @@
               ncol = 2, 
               align = 'hv', 
               axis = 'tblr') %>% 
-    as_figure(label = 'figure_s8_cluster_infiltration', 
+    as_figure(label = 'figure_s10_cluster_infiltration', 
               ref_name = 'clust_infil', 
               caption = paste('Predicted infiltration of T cells,', 
                               'activated mDC and TAM', 
@@ -264,9 +311,9 @@
               w = 180, 
               h = 155)
   
-# Figure S9: tumor stage and MSKCC risk group in the lymphokine clusters -----
+# Figure S11: tumor stage and MSKCC risk group in the lymphokine clusters -----
   
-  insert_msg('Figure S9: tumor stage and risk in the clusters')
+  insert_msg('Figure S11: tumor stage and risk in the clusters')
   
   ## upper panel: staging
   
@@ -282,7 +329,10 @@
          ~.x$pt_stage + 
           theme(legend.position = 'none', 
                 axis.title.x = element_blank()) + 
-          labs(title = .y)) %>% 
+          labs(title = .y, 
+               subtitle = .x$pt_stage$labels$subtitle %>% 
+                 stri_replace(regex = '^V.*,\\s{1}', 
+                              replacement = ''))) %>% 
     c(list(get_legend(clust_clinic$plots$tcga$pt_stage))) %>% 
     plot_grid(plotlist = ., 
               ncol = 3, 
@@ -300,7 +350,10 @@
          ~.x$MSKCC_risk + 
           theme(legend.position = 'none', 
                 axis.title.y = element_blank()) + 
-          labs(title = .y)) %>% 
+          labs(title = .y, 
+               subtitle = .x$MSKCC_risk$labels$subtitle %>% 
+                 stri_replace(regex = '^V.*,\\s{1}', 
+                              replacement = ''))) %>% 
     plot_grid(plotlist = ., 
               ncol = 3, 
               align = 'hv') %>% 
@@ -318,16 +371,16 @@
               rel_heights = c(2, 1.25), 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s9_cluster_stage_distribution', 
+    as_figure(label = 'figure_s11_cluster_stage_distribution', 
               ref_name = 'stage', 
               caption = paste('Distribution of tumor stages and MSKCC risk', 
                               'strata in the lymphokine clusters.'), 
               w = 180, 
               h = 210)
   
-# Figure S10: checkmate response rate -------
+# Figure S12: checkmate response rate -------
   
-  insert_msg('Figure S10: checkmate response rate')
+  insert_msg('Figure S12: checkmate response rate')
   
   suppl_figures$response <- 
     clust_clinic$plots[c('cm10', 'cm25ev', 'cm25ni')] %>% 
@@ -335,7 +388,10 @@
                                            'cm25ev', 
                                            'cm25ni')], 
          ~.x$biresponse + 
-           labs(title = .y) + 
+           labs(title = .y, 
+                subtitle = .x$biresponse$labels$subtitle %>% 
+                  stri_replace(regex = '^V.*,\\s{1}', 
+                               replacement = '')) + 
            theme(legend.position = 'none', 
                  axis.title.x = element_blank())) %>% 
     plot_grid(plotlist = ., 
@@ -345,16 +401,16 @@
                            theme(legend.position = 'bottom')), 
               nrow = 2, 
               rel_heights = c(0.85, 0.15)) %>%
-    as_figure(label = 'figure_s10_cluster_therapy_response', 
+    as_figure(label = 'figure_s12_cluster_therapy_response', 
               ref_name = 'response', 
               caption = paste('Therapy response rates in the lymptokine', 
                               'clusters in the CheckMate cohorts.'), 
               w = 180, 
               h = 85)
   
-# Figure S11: relapse-free survival in the lymphokine clusters ------
+# Figure S13: relapse-free survival in the lymphokine clusters ------
   
-  insert_msg('Figure S11: relapse-free survival in the clusters')
+  insert_msg('Figure S13: relapse-free survival in the clusters')
   
   suppl_figures$clust_rfs <- clust_surv$km_plots$rfs %>% 
     map(~.x + 
@@ -363,104 +419,110 @@
     plot_grid(plotlist = ., 
               ncol = 2, 
               align = 'hv') %>% 
-    as_figure(label = 'figure_s11_cluster_relapse_free_survival', 
+    as_figure(label = 'figure_s13_cluster_relapse_free_survival', 
               ref_name = 'clust_rfs', 
               caption = paste('Relapse-free survival in the', 
                               'lymphokine clusters.'), 
               w = 180, 
               h = 150)
   
-# Figures S12 - S13: univariable OS for the genes of interest -------
+# Figures S: univariable OS for the genes of interest -------
   
-  insert_msg('Figures S12 - S13: univariable OS, genes of interest')
+  ## not show in the paper but available in the repository
+  ## for interested readers
   
-  suppl_figures[c('os1', 'os2')] <- 
-    list(uni_cox$forest[c('CXCL9', 'CXCL10', 'CXCL11', 'CXCR3')], 
-         uni_cox$forest[c('CXCL13', 'CXCR5', 'XCL1', 'XCR1')]) %>% 
-    map(~map(.x, 
-             ~.x + 
-               theme(plot.subtitle = element_blank(), 
-                     legend.position = 'none',
-                     axis.text = element_text(size = 7)))) %>% 
-    map(~plot_grid(plotlist = .x, 
-                   ncol = 2, 
-                   align = 'hv') %>% 
-          plot_grid(get_legend(uni_cox$forest[[1]] + 
-                                 scale_color_manual(values = c(upregulated = 'firebrick', 
-                                                               downregulated = 'steelblue', 
-                                                               ns = 'gray60'), 
-                                                    labels = c(upregulated = 'unfavorable', 
-                                                               downregulated = 'favorable', 
-                                                               ns = 'ns'), 
-                                                    name = 'Effect on survival') + 
-                                 guides(fill = 'none') + 
-                                 theme(legend.position = 'bottom')), 
-                    nrow = 2, 
-                    rel_heights = c(0.93, 0.07)))
+  #insert_msg('Figures S14 - S15: univariable OS, genes of interest')
   
-  suppl_figures[c('os1', 'os2')] <- 
-    suppl_figures[c('os1', 'os2')] %>% 
-    list(x = ., 
-         label = c('figure_s12_overall_survival', 
-                   'figure_s13_overall_survival'), 
-         ref_name = c('os1', 'os2'), 
-         caption = c(paste('Modeling of overall survival as a', 
-                           'function of cancer expression of CXCL9/10/11', 
-                           'and CXCR3.'), 
-                     paste('Modeling of overall survival as a', 
-                           'function of cancer expression of CXCL13,', 
-                           'CXCR5, XCL1 and XCR1.'))) %>% 
-    pmap(as_figure, 
-         w = 180, 
-         h = 150)
+ # suppl_figures[c('os1', 'os2')] <- 
+  #  list(uni_cox$forest[c('CXCL9', 'CXCL10', 'CXCL11', 'CXCR3')], 
+   #      uni_cox$forest[c('CXCL13', 'CXCR5', 'XCL1', 'XCR1')]) %>% 
+   # map(~map(.x, 
+   #          ~.x + 
+   #            theme(plot.subtitle = element_blank(), 
+   #                  legend.position = 'none',
+   #                  axis.text = element_text(size = 7)))) %>% 
+  #  map(~plot_grid(plotlist = .x, 
+   #                ncol = 2, 
+    #               align = 'hv') %>% 
+     #     plot_grid(get_legend(uni_cox$forest[[1]] + 
+      #                           scale_color_manual(values = c(upregulated = 'firebrick', 
+       #                                                        downregulated = 'steelblue', 
+        #                                                       ns = 'gray60'), 
+         #                                           labels = c(upregulated = 'unfavorable', 
+          #                                                     downregulated = 'favorable', 
+           #                                                    ns = 'ns'), 
+            #                                        name = 'Effect on survival') + 
+             #                    guides(fill = 'none') + 
+              #                   theme(legend.position = 'bottom')), 
+               #     nrow = 2, 
+                #    rel_heights = c(0.93, 0.07)))
   
-# Figures S14 - S15: univariable RFS for the genes of interest -------
+ # suppl_figures[c('os1', 'os2')] <- 
+  #  suppl_figures[c('os1', 'os2')] %>% 
+   # list(x = ., 
+    #     label = c('figure_s14_overall_survival', 
+     #              'figure_s15_overall_survival'), 
+      #   ref_name = c('os1', 'os2'), 
+       #  caption = c(paste('Modeling of overall survival as a', 
+        #                   'function of cancer expression of CXCL9/10/11', 
+         #                  'and CXCR3.'), 
+          #           paste('Modeling of overall survival as a', 
+           #                'function of cancer expression of CXCL13,', 
+            #               'CXCR5, XCL1 and XCR1.'))) %>% 
+  # pmap(as_figure, 
+   #      w = 180, 
+    #     h = 150)
   
-  insert_msg('Figures S14 - S15: univariable RFS, genes of interest')
+# Figures S: univariable RFS for the genes of interest -------
   
-  suppl_figures[c('rfs1', 'rfs2')] <- 
-    list(uni_rfs$forest[c('CXCL9', 'CXCL10', 'CXCL11', 'CXCR3')], 
-         uni_rfs$forest[c('CXCL13', 'CXCR5', 'XCL1', 'XCR1')]) %>% 
-    map(~map(.x, 
-             ~.x + 
-               theme(plot.subtitle = element_blank(), 
-                     legend.position = 'none',
-                     axis.text = element_text(size = 7)))) %>% 
-    map(~plot_grid(plotlist = .x, 
-                   ncol = 2, 
-                   align = 'hv') %>% 
-          plot_grid(get_legend(uni_cox$forest[[1]] + 
-                                 scale_color_manual(values = c(upregulated = 'firebrick', 
-                                                               downregulated = 'steelblue', 
-                                                               ns = 'gray60'), 
-                                                    labels = c(upregulated = 'unfavorable', 
-                                                               downregulated = 'favorable', 
-                                                               ns = 'ns'), 
-                                                    name = 'Effect on survival') + 
-                                 guides(fill = 'none') + 
-                                 theme(legend.position = 'bottom')), 
-                    nrow = 2, 
-                    rel_heights = c(0.93, 0.07)))
+  ## not show in the paper but available in the repository
+  ## for interested readers
   
-  suppl_figures[c('rfs1', 'rfs2')] <- 
-    suppl_figures[c('rfs1', 'rfs2')] %>% 
-    list(x = ., 
-         label = c('figure_s14_relapse_free_survival', 
-                   'figure_s15_relapse_free_survival'), 
-         ref_name = c('rfs1', 'rfs2'), 
-         caption = c(paste('Modeling of relapse-free survival as a', 
-                           'function of cancer expression of CXCL9/10/11', 
-                           'and CXCR3.'), 
-                     paste('Modeling of relapse-free survival as a', 
-                           'function of cancer expression of CXCL13,', 
-                           'CXCR5, XCL1 and XCR1.'))) %>% 
-    pmap(as_figure, 
-         w = 180, 
-         h = 130)
+ # insert_msg('Figures S16 - S17: univariable RFS, genes of interest')
   
-# Figure S16: multi-variable ridge Cox regression --------
+  #suppl_figures[c('rfs1', 'rfs2')] <- 
+   # list(uni_rfs$forest[c('CXCL9', 'CXCL10', 'CXCL11', 'CXCR3')], 
+    #     uni_rfs$forest[c('CXCL13', 'CXCR5', 'XCL1', 'XCR1')]) %>% 
+  #  map(~map(.x, 
+   #          ~.x + 
+    #           theme(plot.subtitle = element_blank(), 
+     #                legend.position = 'none',
+      #               axis.text = element_text(size = 7)))) %>% 
+  #  map(~plot_grid(plotlist = .x, 
+   #                ncol = 2, 
+    #               align = 'hv') %>% 
+     #     plot_grid(get_legend(uni_cox$forest[[1]] + 
+      #                           scale_color_manual(values = c(upregulated = 'firebrick', 
+       #                                                        downregulated = 'steelblue', 
+        #                                                       ns = 'gray60'), 
+         #                                           labels = c(upregulated = 'unfavorable', 
+          #                                                     downregulated = 'favorable', 
+           #                                                    ns = 'ns'), 
+            #                                        name = 'Effect on survival') + 
+             #                    guides(fill = 'none') + 
+              #                   theme(legend.position = 'bottom')), 
+               #     nrow = 2, 
+                #    rel_heights = c(0.93, 0.07)))
   
-  insert_msg('Figure S16: Multi-variable ridge Cox regression')
+ # suppl_figures[c('rfs1', 'rfs2')] <- 
+  #  suppl_figures[c('rfs1', 'rfs2')] %>% 
+   # list(x = ., 
+    #     label = c('figure_s16_relapse_free_survival', 
+     #              'figure_s17_relapse_free_survival'), 
+      #   ref_name = c('rfs1', 'rfs2'), 
+       #  caption = c(paste('Modeling of relapse-free survival as a', 
+        #                   'function of cancer expression of CXCL9/10/11', 
+         #                  'and CXCR3.'), 
+          #           paste('Modeling of relapse-free survival as a', 
+           #                'function of cancer expression of CXCL13,', 
+            #               'CXCR5, XCL1 and XCR1.'))) %>% 
+  #  pmap(as_figure, 
+   #      w = 180, 
+    #     h = 130)
+  
+# Figure S14: multi-variable ridge Cox regression --------
+  
+  insert_msg('Figure S14: Multi-variable ridge Cox regression')
   
   suppl_figures$multi_os <- 
     plot_grid(clin_os$coef_plots$genes + 
@@ -480,7 +542,7 @@
               axis = 'tblr', 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s16_multi_paramater_overall_survival', 
+    as_figure(label = 'figure_s14_multi_paramater_overall_survival', 
               ref_name = 'multi_os', 
               caption = paste('Multi-parameter modeling of overall survival', 
                               'as a function of gene expression, demographic', 
@@ -488,15 +550,13 @@
               w = 180, 
               h = 140)
   
+# Figure S15: signaling in the clusters ------
   
-  
-# Figure S17: signaling in the clusters ------
-  
-  insert_msg('Figure S17: signaling in the clusters')
+  insert_msg('Figure S15: signaling in the clusters')
   
   suppl_figures$signaling <- 
     plot_grid(dge_spia$bubble_plots$activated) %>% 
-    as_figure(label = 'figure_s17_cluster_signaling_pathways', 
+    as_figure(label = 'figure_s15_cluster_signaling_pathways', 
               ref_name = 'signaling', 
               caption = paste('Predicted activation of', 
                               'signaling pathways in the chemox high', 
@@ -504,9 +564,9 @@
               w = 180, 
               h = 140)
   
-# Figures S18 - S19: interferon gamma signaling ------
+# Figures S16 - S17: interferon gamma signaling ------
   
-  insert_msg('Figures S18 - S19: interferon gamma')
+  insert_msg('Figures S16 - S17: interferon gamma')
   
   suppl_figures[c('ifn1', 'ifn2')] <- 
     list(dge_ifn$volcano_plots[c('tcga', 'emtab1980', 
@@ -525,8 +585,8 @@
   suppl_figures[c('ifn1', 'ifn2')] <- 
     suppl_figures[c('ifn1', 'ifn2')] %>% 
     list(x = ., 
-         label = c('figure_s18_interferon_gamma_signaling', 
-                   'figure_s19_interferon_gamma_signaling'), 
+         label = c('figure_s16_interferon_gamma_signaling', 
+                   'figure_s17_interferon_gamma_signaling'), 
          ref_name = c('ifn1', 'ifn2'), 
          caption = c(paste('Differential expression of interferon', 
                            'gamma signaling-associated genes between the', 
@@ -539,7 +599,7 @@
          w = 180, 
          h = 180)
   
-# Figures S20 - S21: exhaustion genes in the clusters -------
+# Figures S18 - S19: exhaustion genes in the clusters -------
   
   insert_msg('Exhaustion genes in the clusters')
   
@@ -560,8 +620,8 @@
   suppl_figures[c('exhaustion1', 'exhaustion2')] <- 
     suppl_figures[c('exhaustion1', 'exhaustion2')] %>% 
     list(x = ., 
-         label = c('figure_s20_exhaustion', 
-                   'figure_s21_exhaustion'), 
+         label = c('figure_s18_exhaustion', 
+                   'figure_s19_exhaustion'), 
          ref_name = c('exhaustion1', 'exhaustion2'), 
          caption = c(paste('Differential expression of T cell', 
                            'exhaustion-associated genes between the', 
@@ -574,9 +634,9 @@
          w = 180, 
          h = 180)
   
-# Figure S22: checkpoint genes in the Checkmate cohorts -------
+# Figure S20: checkpoint genes in the Checkmate cohorts -------
   
-  insert_msg('Figure S22: checkpoint genes in the clusters')
+  insert_msg('Figure S20: checkpoint genes in the clusters')
   
   suppl_figures$checkpoint <- dge_exhaust$checkpoint_plots[c('cm10', 
                                                              'cm25ev', 
@@ -595,7 +655,7 @@
               ncol = 2, 
               align = 'hv', 
               axis = 'tblr') %>% 
-    as_figure(label = 'figure_s22_clusters_checkpoint', 
+    as_figure(label = 'figure_s20_clusters_checkpoint', 
               ref_name = 'checkpoint', 
               caption = paste('Differential expression of genes coding', 
                               'for clinically relevant immune checkpoint', 
@@ -604,9 +664,9 @@
               w = 180, 
               h = 140)
   
-# Figure S23: fatty acid oxidation and TCA ---------
+# Figure S21: fatty acid oxidation and TCA ---------
   
-  insert_msg('Figure S23: fatty acid oxidation')
+  insert_msg('Figure S21: fatty acid oxidation')
   
   ## the total number of reaction will be provided in the plot
   ## legend
@@ -624,7 +684,7 @@
               ncol = 3, 
               align = 'hv', 
               axis = 'tblr') %>% 
-    as_figure(label = 'figure_s23_fatty_acid_oxidation', 
+    as_figure(label = 'figure_s21_fatty_acid_oxidation', 
               ref_name = 'fao', 
               caption = paste('Predicted differences in activity of', 
                               'fatty acid oxidation reactions between the', 
@@ -632,9 +692,9 @@
               w = 180, 
               h = 160)
   
-# Figure S24: citric acid cycle --------
+# Figure S22: citric acid cycle --------
   
-  insert_msg('Figure S24: TCA reaction activity')
+  insert_msg('Figure S22: TCA reaction activity')
   
   suppl_figures$tca <- meta_details$tca_detail_plots %>% 
     map(~.x + 
@@ -660,7 +720,7 @@
               rel_heights = c(1, 4), 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s24_citric_acid_cycle', 
+    as_figure(label = 'figure_s22_citric_acid_cycle', 
               ref_name = 'tca', 
               caption = paste('Predicted differences in activity of', 
                               'citric acid cycle reactions between the', 
@@ -668,9 +728,9 @@
               w = 180, 
               h = 230)
   
-# Figure S25: oxidative phosphorylation -------
+# Figure S23: oxidative phosphorylation -------
   
- insert_msg('Figure S25: oxidative phosphorylation')
+ insert_msg('Figure S23: oxidative phosphorylation')
   
   suppl_figures$oxphos <- meta_details$oxphos_sign_plots %>% 
     map(~.x + 
@@ -681,7 +741,7 @@
               ncol = 3, 
               align = 'hv', 
               axis = 'tblr') %>% 
-    as_figure(label = 'figure_s25_oxidative_phosphorylation', 
+    as_figure(label = 'figure_s23_oxidative_phosphorylation', 
               ref_name = 'oxphos', 
               caption = paste('Predicted differences in activity of', 
                               'oxidative phosphorylation complexes between the', 
@@ -689,9 +749,9 @@
               w = 180, 
               h = 160)
   
-# Figure S26: tryptophan decay --------
+# Figure S24: tryptophan decay --------
   
-  insert_msg('Figure S26: tryptophan decay')
+  insert_msg('Figure S24: tryptophan decay')
 
   suppl_figures$trycats <- meta_details$trycats_detail_plots %>% 
     map(~.x + 
@@ -718,7 +778,7 @@
               rel_heights = c(1, 4), 
               labels = LETTERS, 
               label_size = 10) %>% 
-    as_figure(label = 'figure_s26_tryptophan_decay', 
+    as_figure(label = 'figure_s24_tryptophan_decay', 
               ref_name = 'trycats', 
               caption = paste('Predicted differences in activity of', 
                               'the tryptophan/kynurenine/quinolinate pathway', 
@@ -726,9 +786,9 @@
               w = 180, 
               h = 210)
   
-# Figure S27: TRYCATS genes in the clusters, CheckMate cohorts ------
+# Figure S25: TRYCATS genes in the clusters, CheckMate cohorts ------
   
-  insert_msg('Figure S27: TRYCATS genes in the clusters, CheckMate')
+  insert_msg('Figure S25: TRYCATS genes in the clusters, CheckMate')
   
   suppl_figures$trycats_genes <- meta_genes$trycats_plots[c('cm10', 
                                                             'cm25ev', 
@@ -747,7 +807,7 @@
               ncol = 2, 
               align = 'hv', 
               axis = 'tblr') %>% 
-    as_figure(label = 'figure_s27_trycats_genes', 
+    as_figure(label = 'figure_s25_trycats_genes', 
               ref_name = 'trycats_genes', 
               caption = paste('Differential expression of genes involved', 
                               'in the tryptophan/kynurenine/quinolinate', 

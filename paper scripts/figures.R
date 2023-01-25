@@ -45,75 +45,36 @@
   
   insert_msg('Figure 2: correlation with infiltration, xcell')
   
-  ## UMAPS for the TCGA KIRC cohort
+  ## force directed plots for the major cohorts
   
-  ## A: lymphokine pathways genes
-  ## b: immune cells with the most consistent corrlelations
-  ## n numbers will be provided in the figure label
-  
-  figures$xcell$upper_panel <- xcell_clust$gene_layout_plots$tcga %>% 
+  figures$xcell <- xcell_mds$fd_plots[c('tcga', 
+                                        'emtab1980', 
+                                        'gse73731', 
+                                        'gse167093', 
+                                        'reca')] %>% 
     map(~.x + 
-          labs(title = stri_replace(.x$labels$title, 
-                                    fixed = ', TCGA KIRC', 
-                                    replacement = '')) + 
-          scale_color_gradient2(low = 'steelblue3', 
-                               mid = 'gray80', 
-                               high = 'firebrick3', 
-                               midpoint = 0, 
-                               limits = c(-2, 2), 
-                               oob = scales::squish, 
-                               name = 'Z score'))
+          scale_alpha_continuous(range = c(0.05, 0.2), 
+                                 limits = c(0.1, 0.8), 
+                                 oob = scales::squish) + 
+          scale_color_manual(labels = c(gene = 'gene', 
+                                        cell = 'cell neighbor, \u03C1 > 0.4'), 
+                             values = c(gene = 'firebrick4', 
+                                        cell = 'steelblue4')))
   
-  figures$xcell$bottom_panel <- 
-    xcell_clust$immune_layout_plots$tcga[c('T cell CD8+ central memory', 
-                                           'T cell CD8+ effector memory', 
-                                           'T cell CD4+ memory', 
-                                           'T cell CD4+ effector memory', 
-                                           'Myeloid dendritic cell activated', 
-                                           'Macrophage M1', 
-                                           'Macrophage M2')] %>% 
-    map(~.x + 
-          labs(title = stri_replace(.x$labels$title, 
-                                    fixed = ', TCGA KIRC', 
-                                    replacement = '')) + 
-          scale_color_gradient2(low = 'steelblue3', 
-                               mid = 'gray80', 
-                               high = 'firebrick3', 
-                               midpoint = 0, 
-                               limits = c(-2, 2), 
-                               oob = scales::squish, 
-                               name = 'Z score') + 
-          theme(legend.position = 'none', 
-                plot.tag = element_blank(), 
-                plot.title.position = 'plot', 
-                plot.title = element_text(hjust = 0.3))) %>% 
-    c(list(get_legend(figures$xcell$upper_panel[[1]])))
-  
-  figures$xcell$upper_panel <- figures$xcell$upper_panel %>% 
-    map(~.x + 
-          theme(legend.position = 'none', 
-                plot.tag = element_blank(), 
-                plot.title.position = 'plot', 
-                plot.title = element_markdown(hjust = 0.3)))
-  
-  ## the complete figure
-  
-  figures$xcell <- c(figures$xcell$upper_panel, 
-                     figures$xcell$bottom_panel) %>% 
+  figures$xcell <- figures$xcell %>% 
+    map(~.x + theme(legend.position = 'none')) %>% 
+    c(list(get_legend(figures$xcell[[1]]))) %>% 
     plot_grid(plotlist = ., 
-              ncol = 4, 
-              labels = c('A', '', '', '', 
-                         '', '', '', '', 
-                         'B', ''), 
-              label_size = 10) %>% 
+              ncol = 2) %>% 
     as_figure(label = 'figure_2_infiltration_xcell', 
               ref_name = 'xcell', 
               caption = paste('Expression of CXCL9/10/11, CXCL13, XCL1', 
-                              'and their cognate receptors in RCC samples', 
-                              'enriched in CD8+ and CD4+ T cells,', 
-                              'activated myeloid DC and TAM.'), 
+                              'and their cognate receptors', 
+                              'in RCC samples enriched', 
+                              'in CD8^+^ and CD4^+^ T cells,', 
+                              'activated myeloid DC, TAM and B cells.'), 
               w = 180, 
-              h = 180)
+              h = 220)
   
 # Figure 3: single cell RNAseq results -------
   

@@ -106,6 +106,7 @@
       'T cell CD8+ effector memory', 
       'T cell CD4+ memory', 
       'T cell CD4+ effector memory', 
+      'B cell', 
       'Myeloid dendritic cell activated', 
       'Macrophage M1', 
       'Macrophage M2')
@@ -152,7 +153,8 @@
          ~.x + 
            scale_fill_manual(values = globals$cluster_colors, 
                              name = 'Lymphokine cluster') + 
-           scale_y_discrete(labels = .y) + 
+           scale_y_discrete(labels = .y, 
+                            limits = rev(gene_xcell$selected_cells)) + 
            theme(axis.text.y = element_markdown()))
   
 # END ------

@@ -33,6 +33,10 @@
     map_dfc(stri_replace_all,
             regex = 'Mean.*\\nMedian\\s{1}=\\s{1}',
             replacement = '') %>%
+    map_dfc(stri_replace, 
+            regex = ',\\s{1}p.*$', 
+            replacement = '') %>% 
+    set_names(c('Variable', globals$cohort_lexicon$label)) %>% 
     as_mdtable(label = 'table_1_cohort_features',
                ref_name = 'cohort',
                caption = paste('Characteristic of the study cohorts.', 
@@ -42,9 +46,61 @@
                                'percentage and total number within', 
                                'the complete observation set.'))
   
-# Supplementary Table S1: listing of significantly regulated Reactome signs ------
+# Supplementary Table S1: flow cytometry samples -------
   
-  insert_msg('Table S1: Reactome signatures')  
+  insert_msg('Table S1: flo cytometry')
+  
+  suppl_tables$fc <- tibble(Variable = c('Age, years',
+                                         'Sex',
+                                         'Tumor grade',
+                                         'Tumor stage',
+                                         'Lymph node stage',
+                                         'Previous RCC treatment',
+                                         'Tumor entity',
+                                         'Peripheral leukocytes, cells/nL'),
+                            `Patient 1` = c('61',
+                                            'male',
+                                            '2',
+                                            'T1',
+                                            'N0',
+                                            'no',
+                                            'ccRCC',
+                                            '6.38'),
+                            `Patient 2` = c('55',
+                                            'male',
+                                            '1',
+                                            'T3',
+                                            'N0',
+                                            'no',
+                                            'ccRCC',
+                                            '9.24'),
+                            `Patient 3` = c('81',
+                                            'male',
+                                            '2',
+                                            'T1',
+                                            'N0',
+                                            'no',
+                                            'ccRCC',
+                                            '6.34'),
+                            `Patient 4` = c('77',
+                                            'male',
+                                            '1',
+                                            'T1',
+                                            'N0',
+                                            'no',
+                                            'ccRCC',
+                                            '4.24'))
+  
+  suppl_tables$fc <- 
+    mdtable(suppl_tables$fc,
+            label = 'table_s1_flow_cytometry',
+            ref_name = 'fc',
+            caption = paste('Descriptive characteristics of', 
+                            'tissue donors for flow cytometry analysis.'))
+  
+# Supplementary Table S2: listing of significantly regulated Reactome signs ------
+  
+  insert_msg('Table S2: Reactome signatures')  
   
   suppl_tables$reactome <- clust_reactome$significant %>% 
     map(arrange, - estimate) %>% 
@@ -69,9 +125,41 @@
                                '(chemox high vs low). The table is', 
                                'available as a supplementary Excel file.'))
 
-# Supplementary Table S2: numbers of differentially regulated genes -----
+# Supplementary Table S3: signaling pathways -------
   
-  insert_msg('Table S2: numbers of differentially regulated genes')
+  insert_msg('Table S3: signaling pathways')
+  
+  suppl_tables$spia <- dge_spia$test_results %>%
+    map(filter, pGFdr < 0.05) %>%
+    map(arrange, -tA) %>%
+    compress(names_to = 'cohort') %>%
+    mutate(cohort = exchange(cohort,
+                             dict = globals$cohort_lexicon, 
+                             key = 'cohort', 
+                             value = 'label')) %>%
+    select(cohort,
+           ID,
+           Name,
+           tA,
+           pGFdr) %>%
+    set_names(c('Cohort',
+                'KEGG pathway ID',
+                'KEGG pathway name',
+                'Magnitude of regulation, tA',
+                'pFDR')) %>%
+    as_mdtable(label = 'table_s3_spia',
+               ref_name = 'spia',
+               caption = paste('KEGG (Kyoto Encyclopedia of Genes and', 
+                               'Genomes) signaling pathways predicted to be', 
+                               'significantly regulated between the', 
+                               'lymphokine clusters (chemox high vs low)', 
+                               'by the SPIA tool.', 
+                               'The table is available as a supplementary', 
+                               'Excel file.'))
+  
+# Supplementary Table S4: numbers of differentially regulated genes -----
+  
+  insert_msg('Table S4: numbers of differentially regulated genes')
   
   suppl_tables$n_dge <- clust_dge$significant %>% 
     map(count, regulation) %>% 
@@ -83,15 +171,15 @@
                              key = 'cohort', 
                              value = 'label')) %>% 
     select(Cohort, `N downregulated`, `N upregulated`) %>%
-    as_mdtable(label = 'table_s2_number_dge',
+    as_mdtable(label = 'table_s4_number_dge',
                ref_name = 'n_dge',
                caption = paste('Numbers of genes differentially regulated', 
                                'between the lymphokine clusters', 
                                '(chemox high vs low).'))
   
-# Supplementary Table S3: listing of differentially regulated genes -------
+# Supplementary Table S5: listing of differentially regulated genes -------
   
-  insert_msg('Table S3: differentially regulated gene list')
+  insert_msg('Table S5: differentially regulated gene list')
   
   suppl_tables$dge_genes <- clust_dge$significant %>%
     map(mutate, 
@@ -114,48 +202,16 @@
                 'lower CI',
                 'upper CI',
                 'pFDR')) %>%
-    as_mdtable(label = 'table_s3_dge',
+    as_mdtable(label = 'table_s5_dge',
                ref_name = 'dge_gene',
                caption = paste('Genes differentially regulated between', 
                                'the lymphokine clusters (chemox high vs low).', 
                                'The table is', 
                                'available as a supplementary Excel file.'))
   
-# Supplementary Table S4: signaling pathways -------
+# Supplementary Table S6: metabolic pathways ------
   
-  insert_msg('Table S4: signaling pathways')
-  
-  suppl_tables$spia <- dge_spia$test_results %>%
-    map(filter, pGFdr < 0.05) %>%
-    map(arrange, -tA) %>%
-    compress(names_to = 'cohort') %>%
-    mutate(cohort = exchange(cohort,
-                             dict = globals$cohort_lexicon, 
-                             key = 'cohort', 
-                             value = 'label')) %>%
-    select(cohort,
-           ID,
-           Name,
-           tA,
-           pGFdr) %>%
-    set_names(c('Cohort',
-                'KEGG pathway ID',
-                'KEGG pathway name',
-                'Magnitude of regulation, tA',
-                'pFDR')) %>%
-    as_mdtable(label = 'table_s5_spia',
-               ref_name = 'spia',
-               caption = paste('KEGG (Kyoto Encyclopedia of Genes and', 
-                               'Genomes) signaling pathways predicted to be', 
-                               'significantly regulated between the', 
-                               'lymphokine clusters (chemox high vs low)', 
-                               'by the SPIA tool.', 
-                               'The table is available as a supplementary', 
-                               'Excel file.'))
-  
-# Supplementary Table S5: metabolic pathways ------
-  
-  insert_msg('Table S5: predicted regulation of metabolic reactions')
+  insert_msg('Table S6: predicted regulation of metabolic reactions')
   
   suppl_tables$reacts <- meta$models %>%
     map(components, 'regulation') %>%

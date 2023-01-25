@@ -40,6 +40,9 @@
   library(clustTools)
   library(somKernels)
   library(dbscan)
+  library(igraph)
+  library(network)
+  library(ggnetwork)
 
   extract <- clustTools::extract
   nobs <- clustTools::nobs
