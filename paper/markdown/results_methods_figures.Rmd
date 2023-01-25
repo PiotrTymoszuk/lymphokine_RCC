@@ -1,5 +1,5 @@
 ---
-title: "Expression of CXCL9/10/11, CXCL13 and XCL1 orchestrates cytotoxic T cell infiltration and suppression in renal cell carcinoma"
+title: "A Chemokine Signature of T Cell Exhaustion and Metabolic Reprogramming in Renal Cell Carcinoma"
 subtitle: "Methods, Results, Figures and Tables"
 author: "Uro study team"
 date: "`r format(Sys.time(), '%Y-%m-%d')`"
@@ -83,8 +83,10 @@ Donors of tissue for flow cytometry measurements provided written consent.
 
 The analysis was done with R version 4.2.0. 
 Basic data transformation tasks were accomplished with the _tidyverse_ package bundle [@Wickham2019] and the development package _trafo_ (https://github.com/PiotrTymoszuk/trafo). 
-Exploratory data analysis and hypothesis testing was done with the _rstatix_ [@Kassambara2021] and _ExDA_ packages. 
-Results were visualized with the packages _ggplot2_ (bubble plots) [@Wickham2016], _ExDA_ (violin plots; https://github.com/PiotrTymoszuk/ExDA), _microViz_ (Forest plots, bar plots of regulation estimates and p values; https://github.com/PiotrTymoszuk/microViz) and _survminer_ (Kaplan-Meier plots) [@Kassambara2016]. 
+Exploratory data analysis and hypothesis testing was done with the _rstatix_ [@Kassambara2021], _ExDA_ (https://github.com/PiotrTymoszuk/ExDA) and _microViz_ (https://github.com/PiotrTymoszuk/microViz) packages. 
+Network analysis was accomplished with _igraph_ [@Csardi2006]. 
+
+Results were visualized with the packages _ggplot2_ (bubble plots) [@Wickham2016], _ExDA_ (box plots), _microViz_ (Forest plots, Volcano plots, bar plots of regulation estimates and p values), _survminer_ (Kaplan-Meier plots) [@Kassambara2016] and _ggnetwork_ (network plots) [@Briatte2021]. 
 
 ## Data import and transformation
 
@@ -120,9 +122,8 @@ These chemokine genes and their cognate receptors _CXCR3_ (receptor for CXCL9/10
 
 log~2~-transformed expression was compared between the donor-matched normal kidney and cancer samples by two-tailed paired T test and Cohen's d effect size statistic. 
 Correlation of log~2~-transformed gene expression with QuantIseq- and xCell-predicted non-malignant cell content [@Finotello2019; @Aran2017] was investigated with Spearman's test. 
-Median-centered normalized xCell infiltration estimates were subjected to two-dimensional UMAP (Uniform Manifold Approximation and Projection) [@McInnes2018]. 
-Normalized expression and infiltration levels were displayed in UMAP layout plots to visualize clusters of cancer samples characterized by high chemokine expression and extensive infiltration by T cells, myeloid dendritic cell and macrophages. 
-The expression comparison and correlation results were corrected for multiple testing with the false discovery rate (FDR) method [@Benjamini1995].
+The expression comparison and correlation results were corrected for multiple testing with the false discovery rate (FDR) method [@Benjamini1995]. 
+The scaled Spearman's correlation matrices for the genes of interest and cell types associated with them with moderate-to-large strength (correlation coefficient $\rho$ > 0.4) were visualized as force-directed network plots (packages _igraph_ and _ggnetwork_) [@Csardi2006; @Briatte2021].
 
 ## Survival modeling
 
@@ -139,11 +140,11 @@ To assess the add-on effect of gene expression on the survival prediction accura
 ## Semi-supervised clustering
 
 By PAM (partition around medoids) - cosine distance clustering [@Schubert2019; @Drost2018] in respect to to normalized log~2~-transformed expression of the genes of interest, two clusters of RCC samples, the chemokine high and chemokine low cluster were defined in the training TCGA KIRC cohort. 
-The clustering algorithm was chosen based on its excellent reproducibility in 10-fold cross validation [@Lange2004] and good explanatory performance as compared with hierarchical and KMEANS clustering algorithms (__Supplementary Figure S6A__). 
-Choice of the cluster number (k = 2) was motivated by the bend of the within-cluster sum of squares curve, the peak mean silhouette statistic and visual inspection of the heat map of distances between cancer samples (__Supplementary Figure S6BC__).
+The clustering algorithm was chosen based on its excellent reproducibility in 10-fold cross validation [@Lange2004] and good explanatory performance as compared with hierarchical and KMEANS clustering algorithms (__Supplementary Figure S7A__). 
+Choice of the cluster number (k = 2) was motivated by the bend of the within-cluster sum of squares curve, the peak mean silhouette statistic and visual inspection of the heat map of distances between cancer samples (__Supplementary Figure S7BC__).
 
 Prediction of the chemokine cluster assignment in the test collectives (E-MTAB 1980, GSE73731, GSE167093, RECA-EU and CheckMate cohorts) was done with a 15-nearest neighbor (15-NN) classifier with inverse distance weighting. 
-The prediction yielded clustering structures with comparable fractions of explained variance and comparable cluster sizes in the training and the test cohorts indicative of high reproducibility (__Supplementary Figure S7A__).
+The prediction yielded clustering structures with comparable fractions of explained variance and comparable cluster sizes in the training and the test cohorts indicative of high reproducibility (__Supplementary Figure S8A__).
 
 xCell estimates of non-malignant cell infiltration [@Aran2017] were compared between the chemokine clusters by FDR-corrected Mann-Whitney U test. 
 Differences in distribution of tumor stages, MSKCC risk strata and frequencies of best overall therapy response (complete/partial response versus stable/progressive disease) between the clusters were compared by FDR-corrected $\chi^2$ test. 
@@ -181,7 +182,7 @@ The majority of tumors was stage T1.
 In the TCGA, RECA-EU and E-MTAB 1980, information on initial metastasis status was available; only a small fraction of participants had lymph node or distant metastases at RCC diagnosis. 
 The median observation time was noticeably shorter in the CheckMate (CM) 010 and CM 025 collectives. 
 In these cohorts, the rate of relapses and mortality within the observation time window was substantially higher. 
-In the samples from the CheckMate ICI therapy studies, between 5.1 (CM 025 everolimus) and 25% patients (CM 010 and CM 025, nivolumab) displayed an overall therapy response defined as complete or partial response (_Table \@ref(tab:tab-cohort)__).
+In the samples from the CheckMate ICI therapy studies, between 5.1 (CM 025 everolimus) and 25% patients (CM 010 and CM 025, nivolumab) displayed an overall therapy response defined as complete or partial response (__Table \@ref(tab:tab-cohort)__).
 
 ## *CXCL9/10/11*, *CXCL13* and *XCL1* are key chemokines for cytotoxic T cell recruitment in RCC
 
@@ -194,43 +195,42 @@ _CXCL9_, _CXCL10_, _CXCL13_ and _XCL1_ chemokine transcripts and the _CXCR3_, _C
 This upregulation was particularly strong for _CXCL9_, _CXCL10_ and _CXCL13_. 
 In turn, significantly elevated expression of _CXCL11_ and _XCR1_ in RCC as compared with the non-malignant kidney could be observed only in the TCGA KIRC cohort but not in the GSE167093 collective (__Figure \@ref(fig:fig-norm-tumor)__). 
 
-As revealed by UMAP [@McInnes2018] of the TCGA KIRC cancer samples, expression of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _XCL1_ and _XCR1_ was particularly high in specimens abundantly and concomitantly infiltrated by central memory and effector memory CD8^+^ lymphocytes, memory and effector memory CD4^+^ T cells, activated dendritic cells (DC) and tumor-associate macrophages (TAM) as predicted by the xCell immunodeconvolution algorithm [@Aran2017] (__Figure \@ref(fig:fig-xcell)__). 
+As revealed by network analysis of Spearman's correlations between the gene expression and non-malignant cell content predicted by the xCell algorithm [@Aran2017], expression of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _XCL1_ and _XCR1_ was tightly associated with increased infiltration by pan-CD8^+^, central memory and effector memory CD8^+^ T cells, activated myeloid and plasmacytoid dendritic cells (mDC and pDC), tumor-associated macrophages (TAM) and , CD4^+^ T lymphocytes and B cells (__Figure \@ref(fig:fig-xcell)__, __Supplementary Figure S2__). 
 This finding could be corroborated by a correlation analysis in the majority of the investigated cohorts. 
 The association of CD8^+^ T cell levels with _CXCL9_, _CXCL10_ and _CXCL13_ cancer tissue expression was the strongest. 
-Substantially weaker correlations were detected for cytotoxic T cells and _CXCR5_ or _XCR5_ (__Supplementary Figures S2 - S3__). 
-Analogical, highly reproducible correlation could be observed between RCC expression of the genes of interest and CD8^+^ T cell infiltration levels as predicted by the QuanTIseq algorithm [@Finotello2019] (__Supplementary Figure S4 - S5__). 
+Substantially weaker correlations were detected for cytotoxic T cells and _CXCR5_ or _XCR5_ (__Supplementary Figures S3 - S4__). 
+Analogical, highly reproducible correlation could be observed between RCC expression of the genes of interest and CD8^+^ T cell infiltration levels as predicted by the QuanTIseq algorithm [@Finotello2019] (__Supplementary Figure S5 - S6__). 
 Interestingly, levels of neither of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _XCL1_ or _XCR1_ could be significantly and reproducibly associated with regulatory T cell (Treg) infiltration.
 
 -- Place for the scRNAseq results --
 
-The UMAP of TCGA KIRC RCC specimens suggested presence of two clusters of RCC samples differing in T cells infiltration and expression of the chemokine and chemokine receptors of interest (__Figure \@ref(fig:fig-xcell)__). 
-PAM clustering of the TCGA KIRC samples in respect to normalized expression levels of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _XCL1_ and _XCR1_ yielded two distinct subsets of RCC termed further the chemokine high and chemokine low clusters (__Supplementary Figure S6__). 
-This clustering structures was highly conserved in the remaining investigated collectives as evident from comparable fractions of explained clustering variance and similar distribution of chemokine high and chemokine low sample frequencies between the cohorts (__Supplementary Figure S7A__). 
-The strongest differences in expression of the clustering genes between the chemokine high and low cluster cancers were detected for _CXCL9/10/11_, _CXCR3_ and _CXCL13_ (__Figure \@ref(fig:fig-lympho-clust)__, __Supplementary Figure S7B__). 
+PAM clustering of the TCGA KIRC samples in respect to normalized expression levels of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _XCL1_ and _XCR1_ yielded two distinct subsets of RCC termed further the chemokine high and chemokine low clusters (__Supplementary Figure S7__). 
+This clustering structures was highly conserved in the remaining investigated collectives as evident from comparable fractions of explained clustering variance and similar distribution of chemokine high and chemokine low sample frequencies between the cohorts (__Supplementary Figure S8A__). 
+The strongest differences in expression of the clustering genes between the chemokine high and low cluster cancers were detected for _CXCL9/10/11_, _CXCR3_ and _CXCL13_ (__Figure \@ref(fig:fig-lympho-clust)__, __Supplementary Figure S8B__). 
 In line with the correlation results, xCell-predicted infiltration of central memory CD8^+^ T cells was significantly higher in the chemokine high than in the chemokine low cluster in all investigated collectives. 
-Levels of xCell-predicted TAM and activated mDC RCC infiltration were significantly upregulated in chemokine high cancers in the majority of analyzed cohorts (__Figure \@ref(fig:fig-clust-infil)__, __Supplementary Figure S8__).
+Levels of xCell-predicted TAM, activated mDC RCC and B cell infiltration were significantly upregulated in chemokine high cancers in the majority of analyzed cohorts (__Figure \@ref(fig:fig-clust-infil)__, __Supplementary Figure S9__).
 
 Collectively, the results of correlation, single cell RNA sequencing and semi-supervised clustering put forward _CXCL9/10/11_, _CXCL13_ and _XCL1_ chemokine genes along with their receptors _CXCR3_, _CXCR5_ and _XCR1_ as key molecules involved in recruitment of effector memory and central memory CD8^+^ T cells to the RCC. 
 TAM and activated mDC and, to a lesser extent, malignant cells are put forward as the major sources of the investigated chemokines in the RCC microenvironment.
 
 ## No effects of *CXCL9/10/11*, *CXCL13* and *XCL1* on survival and immune checkpoint therapy response
 
-Except for the TCGA KIRC cohort displaying a significant enrichment of late stage tumors in the chemokine high cluster, no significant differences in distribution of tumor stages or MSKCC risk groups could be observed between the clusters (__Supplementary Figure S9__). 
-No differences in best therapy response between the chemokine clusters could be detected either for everolimus treatment or for the ICI therapy with nivolumab in the CheckMate collectives (__Supplementary Figure S10__). 
-Similarly, overall and relapse-free survival times in the clusters did not differ significantly (__Figure \@ref(fig:fig-clust-os)__, __Supplementary Figure S11__).
+Except for the TCGA KIRC cohort displaying a significant enrichment of late stage tumors in the chemokine high cluster, no significant differences in distribution of tumor stages or MSKCC risk groups could be observed between the clusters (__Supplementary Figure S10__). 
+No differences in best therapy response between the chemokine clusters could be detected either for everolimus treatment or for the ICI therapy with nivolumab in the CheckMate collectives (__Supplementary Figure S11__). 
+Similarly, overall and relapse-free survival times in the clusters did not differ significantly (__Figure \@ref(fig:fig-clust-os)__, __Supplementary Figure S12__).
 
 At the level of single genes, an approximately 30% increase in overall mortality risk could be found in the CheckMate 025 nivolumab cohort could be associated with _CXCL10_ and _CXCR3_ expression as revealed by uni-variable Cox modeling. 
 For _CXCR3_, significantly shorter survival was also observed in the TCGA KIRC collective. 
-Intriguingly, high RCC expression was linked to a significantly better overall survival in the RECA-EU collective (__Supplementary Figure S12__). 
+Intriguingly, high RCC expression was linked to a significantly better overall survival in the RECA-EU collective (__Supplementary Figure S13__). 
 High expression of _CXCL13_ and its cognate receptor _CXCR3_ correlated with significantly shorter overall survival in the CheckMate 025 nivolumab and TCGA KIRC collectives. 
 Analogically, _XCL1_ was linked to a higher death risk in the TCGA KIRC cohort. 
-Its receptor _XCR1_ was associated with significantly better overall survival in the TCGA KIRC and RECE-EU collectives and was linked to poor overall survival in the E-MTAB 1980 and CheckMate nivolumab cohorts (__Supplementary Figure S13__).
+Its receptor _XCR1_ was associated with significantly better overall survival in the TCGA KIRC and RECE-EU collectives and was linked to poor overall survival in the E-MTAB 1980 and CheckMate nivolumab cohorts (__Supplementary Figure S14__).
 Significantly shorted relapse-free survival was observed for high RCC levels of _CXCL13_, _CXCR5_ and _XCL1_ in the TCGA KIRC dataset, _XCR1_ was in turn a good prognostic marker in the same collective. 
 However, these observations could not be reproduced in the remaining investigated cohorts. 
-No significant effects of _CXCL9/10/11_ or _CXCR3_ on relapse risk could be discerned (__Supplementary Figures S14 - S15__).
+No significant effects of _CXCL9/10/11_ or _CXCR3_ on relapse risk could be discerned (__Supplementary Figures S15 - S16__).
 
-Finally, in multi-parameter Ridge Cox modeling of overall survival as a function of age, sex, grade, tumor and metastasis stage together with gene expression, RCC levels of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _CXCR5_, _XCL1_ and _XCR5_ were found marginal as compared with age, grade, tumor and metastasis stage (__Supplementary Figure S16A__). 
-As evident from a comparison of concordance indexes of the multi-parameter model consisting of solely clinical and demographic variables and the model including additionally gene expression parameters, there was no add-on value of the investigated gene expression levels to the prediction accuracy of the overall survival in the TCGA KIRC, E-MTAB 1980 or RECA-EU collectives (__Supplementary Figure S16B__).
+Finally, in multi-parameter Ridge Cox modeling of overall survival as a function of age, sex, grade, tumor and metastasis stage together with gene expression, RCC levels of _CXCL9/10/11_, _CXCR3_, _CXCL13_, _CXCR5_, _XCL1_ and _XCR5_ were found marginal as compared with age, grade, tumor and metastasis stage (__Supplementary Figure S17A__). 
+As evident from a comparison of concordance indexes of the multi-parameter model consisting of solely clinical and demographic variables and the model including additionally gene expression parameters, there was no add-on value of the investigated gene expression levels to the prediction accuracy of the overall survival in the TCGA KIRC, E-MTAB 1980 or RECA-EU collectives (__Supplementary Figure S17B__).
 
 Taken together, we could not observe differences in survival between the chemokine high and chemokine low RCC. 
 None of the genes used for cluster definition correlated consistently and significantly with overall or relapse-free survival in more than two out of eight analyzed datasets. 
@@ -241,35 +241,35 @@ This suggests, that potential beneficial effects of cytotoxic T cells recruited 
 To elucidate such mechanisms of activation and suppression of CD8^+^ T cell response in RCC, we delved into differences in transcriptome between chemokine high and chemokine low clusters. 
 In gene set variance analysis [@Hanzelmann2013], ssGSEA scores of gene signatures of `r length(clust_reactome$common_signatures)` Reactome pathways were found significantly upregulated in chemokine high cluster cancers as compared with the chemokine low cluster in all investigated collectives. 
 These included, PD-1 signaling involved in T cell exhaustion and signatures of pathways employing JAK/STAT signaling: interferon (IFN) alpha/beta, IFN gamma, interleukin 9 (IL9) and IL21 signaling (__Figure \@ref(fig:fig-clust-reactome)__, __Supplementary Table S1__). 
-Of note, the upregulation of JAK/STAT along with an activated chemokine and cytokine signaling, and increased cytotoxicity in the chemokine high cluster were identified by the SPIA algorithm modelling activity of signaling pathways based on differential gene expression [@Tarca2009] (__Supplementary Figure S17__). 
+Of note, the upregulation of JAK/STAT along with an activated chemokine and cytokine signaling, and increased cytotoxicity in the chemokine high cluster were identified by the SPIA algorithm modelling activity of signaling pathways based on differential gene expression [@Tarca2009] (__Supplementary Figure S18__). 
 
 To investigate the JAK/STAT signaling and T cell exhaustion processed in more details, we resorted to identification of genes differentially expressed in chemokine high cluster cancers as compared with chemokine low RCC (__Supplementary Tables S2 - S3__). Out of `r length(dge_ifn$genes)` transcripts associated with the IFN alpha/beta and IFN gamma Reactome pathways, between 
 `r dge_ifn$regulation_counts %>% filter(regulation == 'upregulated', cohort != 'cm10') %>% .$n %>% min` and 
 `r dge_ifn$regulation_counts %>% filter(regulation == 'upregulated', cohort != 'cm10') %>% .$n %>% max` genes were upregulated in chemokine high RCC of the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU, CheckMate 025 everolimus and CheckMate 025 nivolumab collectives. 
 Only two IFN signaling/related genes were significantly differentially regulated in the smallest CheckMate 010 cohort. 
 The top regulated IFN signaling-related genes encompassed IFN gamma (_IFNG_), genes of signaling mediators (_JAK2_, _STAT1_, _ISG15_), canonical transcriptional targets of IFN signaling (_IRF_ and _GPB_ family), anti-viral defense genes (_OAS1_, _OASL_, _SAMHB_), antibody receptors (_FCGR1B_, _TRIM21_) and genes of immunoproteasome and antigen-presenting complex (_PSMB8_, _B2M_, _HLA_ family). 
-In particular, high levels of _IFNG_ and direct JAK2/STAT1 transcriptional targets suggest high activity and functionality of IFN gamma-mediated signaling in chemokine high RCC (__Supplementary Figures S18 - S19__). 
+In particular, high levels of _IFNG_ and direct JAK2/STAT1 transcriptional targets suggest high activity and functionality of IFN gamma-mediated signaling in chemokine high RCC (__Supplementary Figures S19 - S20__). 
 Of note, _CXCL9/10/11_ belong to classical IFN gamma-stimulated genes and as such may perpetuate cytotoxic T cell recruitment to the IFN-rich milieu of chemokine high RCC.
 
 A sizable fraction of genes related to T cell exhaustion [@Zhang2022; @Kocher2022; @Woroniecka2018; @Cai2020] was upregulated in the chemokine high cluster as compared with chemokine low cluster RCC of the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU, CheckMate 025 everolimus and CheckMate 025 nivolumab collectives (total genes: `r dge_exhaust$genes %>% nrow`, upregulated genes: `r dge_exhaust$analysis_tbl[names(dge_exhaust$analysis_tbl) != 'cm10'] %>% map(filter, regulation == 'upregulated') %>% map_dbl(nrow) %>% min` - `r dge_exhaust$analysis_tbl[names(dge_exhaust$analysis_tbl) != 'cm10'] %>% map(filter, regulation == 'upregulated') %>% map_dbl(nrow) %>% max`). 
-These upregulated genes included transcripts of surface co-stimulation/inhibition molecules (_TIGIT_, _CD27_, _ICOS_, _LAG3_, _TNFSRF9_), cytotoxic proteins (_GZMB_) and transcription factors driving T cell differentiation, persistence and exhaustion (_TOX_, _EOMES_, _BATF_) (__Supplementary Figures S20 - S21__). 
-Genes coding for immune checkpoint proteins targeted for experimental and approved drugs, _PDCD1_, _CD274_ (PD-L1), _PDCD1LG2_ (PD-L2), _CTLA4_ and _HAVCR2_ (TIM3), were found to be expressed at significantly higher levels in the chemokine high than chemokine low cluster in the majority of analyzed cohorts (__Figure \@ref(fig:fig-checkpoint)__, __Supplementary Figure S22__). In sum, the abundant cytotoxic T cell infiltration and high activity of potentially anti-tumorigenic IFN signaling in chemokine high cluster RCC is strongly counteracted by multiple redundant immune checkpoint and T cell exhaustion processes. 
+These upregulated genes included transcripts of surface co-stimulation/inhibition molecules (_TIGIT_, _CD27_, _ICOS_, _LAG3_, _TNFSRF9_), cytotoxic proteins (_GZMB_) and transcription factors driving T cell differentiation, persistence and exhaustion (_TOX_, _EOMES_, _BATF_) (__Supplementary Figures S21 - S22__). 
+Genes coding for immune checkpoint proteins targeted for experimental and approved drugs, _PDCD1_, _CD274_ (PD-L1), _PDCD1LG2_ (PD-L2), _CTLA4_ and _HAVCR2_ (TIM3), were found to be expressed at significantly higher levels in the chemokine high than chemokine low cluster in the majority of analyzed cohorts (__Figure \@ref(fig:fig-checkpoint)__, __Supplementary Figure S23__). In sum, the abundant cytotoxic T cell infiltration and high activity of potentially anti-tumorigenic IFN signaling in chemokine high cluster RCC is strongly counteracted by multiple redundant immune checkpoint and T cell exhaustion processes. 
 
 ## High *CXCL9/10/11*, *CXCL13* and *XCL1* expression is paralleled by reduced oxidative energy metabolism and enhanced immunosuppressive IDO1-mediated tryptophan decay
 
 Finally, we sought to investigate potential alterations of cellular metabolism in the chemokine high cluster as compared with chemokine low cluster RCC based on whole-genome differences in gene expression [@Gavai2015; @King2016] (__Supplementary Table S5__). 
 In such analysis, substantial fractions of reactions involved in oxidative energy metabolism: fatty acid oxidation, citric acid cycle and oxidative phosphorylation were found to be inhibited in chemokine high cancers. 
 In turn, one-third of reactions of tryptophan metabolism (TRP) implicated in T cell immunosuppression were significantly upregulated in chemokine high cancers of the TCGA KIRC collective (__Figure \@ref(fig:fig-meta-global)__). 
-In more detail, widespread significant inhibition of multiple fatty acid oxidation reactions was observed in chemokine high cancers of the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093 and CheckMate 025 nivolumab cohorts (__Supplementary Figure S23__). 
-An overall reduced activity of the citric acid cycle was particularly evident in chemokine high cluster cancers of the four largest collectives (TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093) and the 2-oxoglutarate - malate section of the cycle (__Supplementary Figure S24__). 
-In oxidative phosphorylation, sustained inhibition the complexes I and IV could be detected (__Supplementary Figure S25__). 
+In more detail, widespread significant inhibition of multiple fatty acid oxidation reactions was observed in chemokine high cancers of the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093 and CheckMate 025 nivolumab cohorts (__Supplementary Figure S24__). 
+An overall reduced activity of the citric acid cycle was particularly evident in chemokine high cluster cancers of the four largest collectives (TCGA KIRC, E-MTAB 1980, GSE73731 and GSE167093) and the 2-oxoglutarate - malate section of the cycle (__Supplementary Figure S25__). 
+In oxidative phosphorylation, sustained inhibition the complexes I and IV could be detected (__Supplementary Figure S26__). 
 
 In the chemokine high clusters of the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093 and RECA-EU cancers, significant >50% increase in activity of indoleamine 2,3-dioxygenase (IDO) was detected, a reaction responsible for TRP depletion and the first step of synthesis of immunosuppressive kynurenin and quinolinic acid. 
 In the CheckMate collectives, an increased predicted IDO activity was evident, yet missed statistical significance following multiple testing correction. 
-Furthermore, we could observe an elevated activity of kynureninase (KYNU), a key enzyme in quinolinate biosynthesis, in chemokine high cancers as compared with the chemokine low cluster (__Supplementary Figure S26__). 
-These findings were could be corroborated at the gene expression level in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, where both isoforms of IDO, _IDO1_ and _IDO2_ were significantly upregulated in the chemokine cluster. 
+Furthermore, we could observe an elevated activity of kynureninase (KYNU), a key enzyme in quinolinate biosynthesis, in chemokine high cancers as compared with the chemokine low cluster (__Supplementary Figure S27__). 
+These findings were could be corroborated at the gene expression level in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, where both isoforms of IDO, _IDO1_ and _IDO2_ were significantly upregulated in the chemokine high cluster. 
 Significantly higher levels of _IDO1_ could be detected in the RECA-EU and CheckMate 025 everolimus chemokine high cancers as well. 
-_KYNU_ gene was also expressed at significantly increased levels in chemokine high cancers in four out of eight investigated cohorts (__Figure \@ref(fig:fig-trycats-genes)__, __Supplementary Figure S27__).
+_KYNU_ gene was also expressed at significantly increased levels in chemokine high cancers in four out of eight investigated cohorts (__Figure \@ref(fig:fig-trycats-genes)__, __Supplementary Figure S28__).
 
 Results of metabolic reaction activity modeling based on differential gene expression suggest profound inhibition of oxidative energy metabolism of chemokine high cancers along with increased activity of immunosuppressive TRP - kynurenin - quinolinate pathway. 
 These processes may pose another hurdles to effective anti-tumor T cell response in RCC cancers hallmarked by high expression of _CXCL9/10/11_, _CXCL13_ and _XCL1_ cytotoxic T cell-attracting chemokines.
@@ -283,6 +283,10 @@ These processes may pose another hurdles to effective anti-tumor T cell response
 flextable::flextable(tables$cohort) %>% 
   flextable::width(1, width = 3, unit = 'cm') %>% 
   flextable::width(2:9, width = 2.2, unit = 'cm') %>% 
+  footnote(11, 1, 
+           value = as_paragraph('Complete or pertial response'),
+           part = 'body', 
+           ref_symbols = 'a') %>% 
   theme_vanilla
 
 ```
@@ -303,15 +307,15 @@ _Differences in expression of CXCL9/10/11, CXCR3, CXCL13, CXCR5, XCL1 and XCR1 b
 
 \newpage
 
-```{r fig-xcell, fig.width = mm_inch(figures$xcell$w), fig.height = mm_inch(figures$xcell$h), fig.cap = 'Expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors in RCC samples enriched in CD8+ and CD4+ T cells, activated myeloid DC and TAM.'}
+```{r fig-xcell, fig.width = mm_inch(figures$xcell$w), fig.height = mm_inch(figures$xcell$h), fig.cap = 'Expression of CXCL9/10/11, CXCL13, XCL1 and their cognate receptors in RCC samples enriched in CD8^+^ and CD4^+^ T cells, activated myeloid DC, TAM and B cells.'}
 
 figures$xcell$plot
 
 ```
 
-__Figure \@ref(fig:fig-xcell). Expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors in RCC samples enriched in CD8^+^ and CD4^+^ T cells, activated myeloid DC and TAM.__ 
+__Figure \@ref(fig:fig-xcell). Expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors in RCC samples enriched in CD8^+^ and CD4^+^ T cells, activated myeloid DC, TAM and B cells.__ 
 
-_TCGA KIRC cancer samples were subjected to two-dimensional UMAP (uniform manifold approximation and projection) in respect to normalized median-centered xCell estimates of non-malignant cell content. UMAP scores (layouts) for single cancer samples are presented in point plots. Point color codes for (A) normalized gene expression or (B) normalized levels of central memory CD8^+^ T cells (CD8^+^ Tcm), effector memory CD8^+^ T cells (CD8^+^ Tem), memory CD4^+^ T cells (CD4^+^ Tm), effector memory CD4^+^ T cells (CD4^+^ Tem), activated myeloid dendritic cells (act mDC), M1 and M2 tumor-associated macrophages (TAM)._
+_Pairwise association of the gene expression and xCell non-immune cell infiltration estimates was assessed by scaled Spearman's correlation. The genes of interest and the cell types associated with the genes of interest with moderate-to-large strength (correlation coefficient $\rho$ > 0.4) were visualized as network force-directed plots with edge weighting by the scaled Spearman's correlation coefficient. CD8^+^ T: CD8^+^ T cells, CD4^+^ T: CD4^+^ T cells, n: naive; m: memory; em: effector memory; cm: central memory; Th1: T helper cells 1; Th1: T helper cells 1; mDC: myeloid dendritic cells, act mDC: activated mDC; pDC: plasmacytoid dendritic cells; TAM: tumor-associated macrophages; B: B cells, switch Bm: class-switched memory B cells; NK: natural killer cells; NKT: natural killer T cells; T $\gamma\delta$: $\gamma\delta$ T cells; Mono: monocytes; Eosino: eosinophils._
 
 \newpage
 
@@ -333,7 +337,7 @@ figures$lympho_clust$plot
 
 __Figure \@ref(fig:fig-lympho-clust). Expression of *CXCL9/10/11*, *CXCL13*, *XCL1* and their cognate receptors in the chemokine clusters.__ 
 
-_chemokine clusters of RCC samples were defined in the TCGA KIRC training cohort in respect to normalized log~2~-transformed expression of CXCL9/10/11, CXCR3, CXCL13, XCL1 and XCR1 by the PAM/cosine distance algorithm. Prediction of cluster assignment in the E-MTAB 1980, GSE73731, GSE167093, RECA-EU, CheckMate 010, CheckMate 025 everolimus and CheckMate 025 nivolumab (CM 025 NIVO) was done with the inverse distance-weighted 15-nearest neighbor classifier. log~2~ transformed expression of the clustering genes was compared between the chemokine (chemox) high and low cluster by false discovery rate (FDR) corrected two-tailed T test in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU collectives. Mean normalized expression values are visualized as thick lines, tinted regions represent two standard errors of the mean (SEM). P values are shown in the Y axis. Numbers of cancer samples assigned to the clusters are displayed in the plot captions._
+_Chemokine clusters of RCC samples were defined in the TCGA KIRC training cohort in respect to normalized log~2~-transformed expression of CXCL9/10/11, CXCR3, CXCL13, XCL1 and XCR1 by the PAM/cosine distance algorithm. Prediction of cluster assignment in the E-MTAB 1980, GSE73731, GSE167093, RECA-EU, CheckMate 010, CheckMate 025 everolimus and CheckMate 025 nivolumab (CM 025 NIVO) was done with the inverse distance-weighted 15-nearest neighbor classifier. log~2~ transformed expression of the clustering genes was compared between the chemokine (chemox) high and low cluster by false discovery rate (FDR) corrected two-tailed T test in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU collectives. Mean normalized expression values are visualized as thick lines, tinted regions represent two standard errors of the mean (SEM). P values are shown in the Y axis. Numbers of cancer samples assigned to the clusters are displayed in the plot captions._
 
 \newpage
 
@@ -343,9 +347,9 @@ figures$clust_infil$plot
 
 ```
 
-__Figure \@ref(fig:fig-clust-infil). Predicted infiltration of T cells, activated mDC and TAM in the chemokine clusters.__ 
+__Figure \@ref(fig:fig-clust-infil). Predicted infiltration of T and B cells, activated mDC and TAM in the chemokine clusters.__ 
 
-_Differences in levels of effector memory CD8^+^ T (CD8^+^ Tem), central memory CD8^+^ T (CD8^+^ Tcm), memory CD4^+^ T (CD4^+^ Tm), effector memory CD4^+^ T cells (CD4^+^ Tem), activated myeloid dendritic cells (act mDC), M1 and M2 tumor-associated macrophages (TAM) between the chemokine (chemox) high an chemokine low cluster were assessed by false discovery rate (FDR) corrected Mann-Whitney test in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU collectives. Median normalized infiltration levels with interquartile ranges (IQR) are presented as boxes, whiskers span over the 150% IQR. Points represent single cancer samples. P values are indicated in the Y axes, significant effects are highlighted in bold. Numbers of cancer samples assigned to the chemokine high and low clusters are displayed in the plot captions._
+_Differences in levels of effector memory CD8^+^ T (CD8^+^ Tem), central memory CD8^+^ T (CD8^+^ Tcm), memory CD4^+^ T (CD4^+^ Tm), effector memory CD4^+^ T cells (CD4^+^ Tem), B cells (B), activated myeloid dendritic cells (act mDC), M1 and M2 tumor-associated macrophages (TAM) between the chemokine (chemox) high an chemokine low cluster were assessed by false discovery rate (FDR) corrected Mann-Whitney test in the TCGA KIRC, E-MTAB 1980, GSE73731, GSE167093, RECA-EU collectives. Median normalized infiltration levels with interquartile ranges (IQR) are presented as boxes, whiskers span over the 150% IQR. Points represent single cancer samples. P values are indicated in the Y axes, significant effects are highlighted in bold. Numbers of cancer samples assigned to the chemokine high and low clusters are displayed in the plot captions._
 
 \newpage
 
