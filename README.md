@@ -47,6 +47,10 @@ source('exec.R')
 
 ```
 
+## Contact
+
+The maintainer of the repository is [Piotr Tymoszuk](mailto:piotr.s.tymoszuk@gmail.com).
+
 [^1]: Creighton CJ, Morgan M, Gunaratne PH, Wheeler DA, Gibbs RA, Robertson G, Chu A, Beroukhim R, Cibulskis K, Signoretti S, et al. Comprehensive molecular characterization of clear cell renal cell carcinoma. Nature 2013 499:7456 (2013) 499:43–49. doi: 10.1038/nature12222
 
 [^2]: Braun DA, Hou Y, Bakouny Z, Ficial M, Sant’ Angelo M, Forman J, Ross-Macdonald P, Berger AC, Jegede OA, Elagina L, et al. Interplay of somatic alterations and immune infiltration modulates response to PD-1 blockade in advanced clear cell renal cell carcinoma. Nature medicine (2020) 26:909. doi: 10.1038/S41591-020-0839-Y
