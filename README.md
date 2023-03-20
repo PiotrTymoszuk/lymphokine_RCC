@@ -1,10 +1,14 @@
 # lymphokine_RCC
 
-Role of CXCL9/10/11, CXCL13 and XCL1 in recruitment and suppressio of cytotoxic T cells in renal cell carcinoma
+Role of CXCL9/10/11, CXCL13 and XCL1 in recruitment and suppression of cytotoxic T cells in renal cell carcinoma
+
+<p align = "center"> 
+<img src = "https://user-images.githubusercontent.com/80723424/226281246-e530fe3e-8c1e-4e03-b631-583bd50b058d.png" width = "65%">
+</p>
 
 ## Terms of use
 
-The pipeline results will be included in a future publication by Renate Pichler et al (submitted). The analysis concerns solely publicly available data cited below. To reference and use analysis results, please cite our GitHub repository; the data sources listed below and, if available, the publication. In any questions, please contact [Renate Pichler](mailto:renate.pichler@i-med.ac.at) or [Piotr Tymoszuk](mailto:piotr.s.tymoszuk@gmail.com).
+The pipeline results are included in a publication by [Renate Pichler et al.](https://www.frontiersin.org/articles/10.3389/fimmu.2023.1095195/full) (DOI: 10.3389/fimmu.2023.1095195). The analysis concerns solely publicly available data cited below. To reference and use analysis results, please cite our GitHub repository; the data sources listed below and our publication. In any questions, please contact [Renate Pichler](mailto:renate.pichler@i-med.ac.at) or [Piotr Tymoszuk](mailto:piotr.s.tymoszuk@gmail.com).
 
 ## Data sources
 
